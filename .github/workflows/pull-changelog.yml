@@ -16,9 +16,9 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const labelsWhereChangelogChangeIsRequired = [
-            'Action: patch bump',
-            'Action: minor bump',
-            'Action: major bump',
+            'patch',
+            'minor',
+            'major',
           ];
 
           const { data: labels } = await github.rest.issues.listLabelsOnIssue({

@@ -6,57 +6,6 @@ on:
     types: [closed]
 
 jobs:
-  generate-docs:
-    name: 'generate docs and push'
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: master
-        token: ${{ secrets.TOKEN_REPO_WRITE }}
-
-    - name: Git config
-      run: |
-        git config user.name "Github actions"
-        git config user.email "github-actions@iadvize.com"
-
-    - name: Fetch or create gh-pages
-      run: |
-        if git fetch origin gh-pages; then
-          git branch --track gh-pages origin/gh-pages
-        else
-          git checkout --orphan gh-pages
-
-          git reset .
-          git commit --allow-empty -m "Init"
-
-          git push origin gh-pages
-
-          git checkout -f master
-        fi
-
-    - uses: actions/setup-node@v3
-      with:
-        node-verion: '18.x'
-
-    - name: Install
-      run: npm ci
-
-    - name: Generate new docs
-      run: |
-        npm run docs
-
-    - name: Push gh-pages
-      run: |
-        git worktree add gh-pages-content gh-pages
-        cp -r docs/* gh-pages-content
-        cd gh-pages-content
-
-        git add .
-        git commit --allow-empty -m "documentation: generate new documentation"
-        git push origin gh-pages
-
   publish:
     name: 'create version and deploy'
     runs-on: ubuntu-latest
@@ -66,10 +15,10 @@ jobs:
 
     if: >
       github.event.pull_request.merged == true && (
-        contains(github.event.pull_request.labels.*.name, 'Action: patch bump')
-      || contains(github.event.pull_request.labels.*.name, 'Action: minor bump')
-      || contains(github.event.pull_request.labels.*.name, 'Action: major bump')
-      || contains(github.event.pull_request.labels.*.name, 'Action: beta bump')
+        contains(github.event.pull_request.labels.*.name, 'patch')
+      || contains(github.event.pull_request.labels.*.name, 'minor')
+      || contains(github.event.pull_request.labels.*.name, 'major')
+      || contains(github.event.pull_request.labels.*.name, 'beta')
       )
 
     steps:
@@ -85,7 +34,7 @@ jobs:
 
     - uses: actions/setup-node@v3
       with:
-        node-verion: '18.x'
+        node-version: '18.x'
 
     - name: Install
       run: npm ci
@@ -96,19 +45,16 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const versionLabels = {
-            'Action: patch bump': 'patch',
-            'Action: minor bump': 'minor',
-            'Action: major bump': 'major',
-            'Action: beta bump': 'beta',
-          };
-
-          const versionLabelsNames = Object.keys(versionLabels);
-
+          const versionLabels = [
+            'beta',
+            'patch',
+            'minor',
+            'major',
+          ];
           const labels = context.payload.pull_request.labels;
 
           const versionLabelsPresent = labels
-            .filter(label => versionLabelsNames.includes(label.name))
+            .filter(label => versionLabels.includes(label.name))
 
           console.log(`::debug ::${versionLabelsPresent.length} matching labels`);
 

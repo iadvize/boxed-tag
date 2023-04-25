@@ -16,11 +16,10 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const versionLabels = [
-            'Action: no bump',
-            'Action: beta bump',
-            'Action: patch bump',
-            'Action: minor bump',
-            'Action: major bump',
+            'beta',
+            'patch',
+            'minor',
+            'major',
           ];
 
           const { data: labels } = await github.rest.issues.listLabelsOnIssue({
