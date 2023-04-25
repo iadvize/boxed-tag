@@ -1,0 +1,51 @@
+{
+  "name": "@iadvize-oss/sandboxed-tag",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Sandboxed iAdvize tag",
+  "main": "dist/index.js",
+  "module": "esm/index.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "esm"
+  ],
+  "scripts": {
+    "build": "rm -rf dist esm && rollup -c",
+    "test:js": "jest --coverage",
+    "lint:js": "eslint . --ext .js,.jsx,.ts,.tsx,.json,.d.ts --cache",
+    "bump-changelog": "VERSION=$(cat package.json | jq '.version') && remark CHANGELOG.md -o --use @jarrodldavis/changelog-version-bump=version:$VERSION && git add CHANGELOG.md"
+  },
+  "homepage": "https://github.com/iadvize/sandboxed-tag#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iadvize/sandboxed-tag.git"
+  },
+  "keywords": [
+    "iAdvize"
+  ],
+  "bugs": {
+    "url": "https://github.com/iadvize/sandboxed-tag/issues"
+  },
+  "author": "iAdvize developers",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@iadvize-oss/eslint-config": "^4.0.0",
+    "@iadvize-oss/eslint-config-jest": "^2.0.0",
+    "@rollup/plugin-commonjs": "^24.1.0",
+    "@types/jest": "^29.5.1",
+    "eslint": "^8.39.0",
+    "jest": "^29.5.0",
+    "rollup": "^3.21.0",
+    "rollup-plugin-multi-input": "^1.4.1",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "ts-jest": "^29.1.0",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "jest-environment-jsdom": "^29.5.0"
+  }
+}

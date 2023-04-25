@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "target": "ES6",
+    "module": "ES6",
+    "moduleResolution": "Node",
+    "noEmitOnError": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "downlevelIteration": true,
+    "forceConsistentCasingInFileNames": true,
+    "suppressExcessPropertyErrors": false,
+    "declaration": true,
+    "lib": ["dom", "dom.iterable", "esnext"]
+  },
+  "exclude": ["node_modules"],
+  "include": ["src", "@types", "test/host.test.ts"]
+}
