@@ -22,6 +22,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         ref: master
+        token: ${{ secrets.TOKEN_REPO_WRITE }}
 
     - name: Git config
       run: |
@@ -48,8 +49,6 @@ jobs:
             'major',
           ];
           const labels = context.payload.pull_request.labels;
-
-          console.log(labels);
 
           const versionLabelsPresent = labels
             .filter(label => versionLabels.includes(label.name))
@@ -96,13 +95,13 @@ jobs:
         git push --tags
 
         COMMIT_ID=$(git rev-parse HEAD)
-        echo "::set-output name=ref::$COMMIT_ID"
+        echo "ref=$COMMIT_ID" >> $GITHUB_OUTPUT           
 
         VERSION=$(cat package.json | jq -r '.version')
-        echo "::set-output name=version::$VERSION"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
         NAME=$(cat package.json | jq -r '.name')
-        echo "::set-output name=name::$NAME"
+        echo "name=$NAME" >> $GITHUB_OUTPUT
 
     - name: Create deployment
       id: deployment
@@ -151,7 +150,8 @@ jobs:
         VERSION_PART="${VERSION_PART//$'\r'/'%0D'}"
         echo VERSION_PART=$VERSION_PART
 
-        echo "::set-output name=version-part::$VERSION_PART"
+        echo "version-part=$VERSION_PART" >> $GITHUB_OUTPUT
+        
 
     - name: Create Release
       if: steps.extract-version-label.outputs.versionBump != 'beta'

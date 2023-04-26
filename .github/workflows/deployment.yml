@@ -61,7 +61,7 @@ jobs:
         npm version $VERSION --allow-same-version --no-git-tag-version
         npm publish --access public --tag $TAG
 
-        echo "::set-output name=state::done"
+        echo "name=state::done" >> $GITHUB_OUTPUT
 
     - name: Update deployment status
       if: always()

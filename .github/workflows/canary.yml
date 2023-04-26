@@ -25,8 +25,8 @@ jobs:
 
         NAME=$(cat package.json | jq -r '.name')
 
-        echo "::set-output name=version::$NEW_VERSION"
-        echo "::set-output name=name::$NAME"
+        echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "name=$NAME" >> $GITHUB_OUTPUT
 
     - uses: actions/setup-node@v3
       with:
