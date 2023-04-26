@@ -31,7 +31,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         registry-url: https://registry.npmjs.org/
-        node-verion: '18.x'
+        node-version: '18.x'
 
     - name: Cache npm cache
       uses: actions/cache@v3
@@ -60,7 +60,7 @@ jobs:
         NAME: ${{ steps.compute-version.outputs.name }}
         VERSION: ${{ steps.compute-version.outputs.version }}
       with:
-        github-token: ${{ secrets.TOKEN_REPO_WRITE }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         previews: 'ant-man-preview,flash-preview'
         script: |
           const name = process.env.NAME;

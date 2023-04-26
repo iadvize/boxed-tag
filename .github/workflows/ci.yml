@@ -17,7 +17,7 @@ jobs:
 
     - uses: actions/setup-node@v3
       with:
-        node-verion: '18.x'
+        node-version: '18.x'
 
     - name: Cache npm cache
       uses: actions/cache@v3
@@ -51,7 +51,7 @@ jobs:
 
     - uses: actions/setup-node@v3
       with:
-        node-verion: '18.x'
+        node-version: '18.x'
 
     - name: Restore node_modules
       uses: actions/cache@v3
@@ -75,7 +75,7 @@ jobs:
 
   #   - uses: actions/setup-node@v3
   #     with:
-  #       node-verion: '18.x'
+  #       node-version: '18.x'
 
   #   - name: Restore node_modules
   #     uses: actions/cache@v3
@@ -99,7 +99,7 @@ jobs:
 
     - uses: actions/setup-node@v3
       with:
-        node-verion: '18.x'
+        node-version: '18.x'
 
     - name: Restore node_modules
       uses: actions/cache@v3
