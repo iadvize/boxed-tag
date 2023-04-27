@@ -41,6 +41,7 @@ jobs:
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
         script: |
           const versionLabels = [
             'beta',
@@ -49,7 +50,6 @@ jobs:
             'major',
           ];
           const labels = context.payload.pull_request.labels;
-          console.log(labels);
           const versionLabelsPresent = labels
             .filter(label => versionLabels.includes(label.name))
 
@@ -60,10 +60,7 @@ jobs:
           }
 
           if (versionLabelsPresent.length === 1) {
-            console.log(versionLabelsPresent);
-            const versionBump = versionLabels[versionLabelsPresent[0].name];
-            console.log(versionBump);
-            
+            const versionBump = versionLabelsPresent[0].name;
             return versionBump;
           }
 
