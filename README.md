@@ -103,9 +103,8 @@ window.addEventListener('message', ({ data: { foo } }) => {
 Web SDK methods cannot be called from host context because the iAdvize tag is isolated in the iframe. So we need to tell the iframe what we want to call.  
 After having called `initIAdvizeHost`, a `iAdvizeInternals` object is available in the host window context.  
 This object sends the `method` name and `args` to the iframe, that will call the web SDK.
-
-> **Warning** Because of the `postMessage` between host and the iframe, the arguments are stringified, thus function arguments cannot be passed.  
-So `activate`, `logout`, `on`, `off` methods cannot be called.
+The `activate` and `on` methods can return a value to the host :  
+to retrieve it, add a `window.addEventListener("message")` and check the `e.date.method` property to recognize the method called.
 
 example:
 
@@ -113,43 +112,85 @@ example:
 // Init iAdvizeInternals
 initIAdvizeHost('myIframeId');
 
-// Navigate
+// Web SDK navigate
 window.iAdvizeInternals.push({
   method: 'navigate',
   args: [window.location.href],
 });
 
-// Get property
+// Web SDK activate anonymous
 window.iAdvizeInternals.push({
-  method: 'get',
-  args: ['visitor:cookiesConsent'],
+  method: 'activate',
+  args: [
+    JSON.stringify({
+      authenticationOption: { type: 'ANONYMOUS' },
+    }),
+  ],
 });
 
-// Set property
+// Web SDK activate secured auth
+const getToken = new Promise((resolve) => resolve('myToken'));
+const visitor_token = await getToken(); // your backend logic to generate a JWE
+
+window.iAdvizeInternals.push({
+  method: 'activate',
+  args: [
+    JSON.stringify({
+      authenticationOption: {
+        type: 'SECURED_AUTHENTICATION',
+        token: visitor_token,
+      },
+    }),
+  ],
+});
+
+// Listen activate result
+window.addEventListener('message', ({ data: { method, activation } }) => {
+  if (method === 'activate') {
+    console.log(activation); // activation return object : success or failure
+  }
+});
+
+// Web SDK logout
+window.iAdvizeInternals.push({
+  method: 'logout',
+});
+
+// Listen logout
+window.addEventListener('message', ({ data: { method } }) => {
+  if (method === 'logout') {
+    // Do something after logout
+  }
+});
+
+// Web SDK on
+window.iAdvizeInternals.push({
+  method: 'on',
+  args: ['cookiesConsentChanged'],
+});
+
+// Listen on cookiesConsentChanged result
+window.addEventListener('message', ({ data: { method, value } }) => {
+  if (method === 'on') {
+    console.log(value); // cookiesConsentChanged value
+  }
+});
+
+// Web SDK off
+window.iAdvizeInternals.push({
+  method: 'off',
+  args: ['cookiesConsentChanged'],
+});
+
+// Web SDK set
 window.iAdvizeInternals.push({
   method: 'set',
   args: ['visitor:GDPRConsent', true],
 });
-```
 
-## Call web SDK methods from iframe
-
-The web SDK methods can be called normally in the iframe window context.
-
-example:
-
-```js
-// Activate
-window.iAdvizeInterface.push((iAdvize) => {
-  iAdvize.activate(() => ({
-    authenticationOption: { type: 'ANONYMOUS' },
-  }));
-});
-
-// On
-window.iAdvizeInterface.push(function (iAdvize) {
-  iAdvize.on('visitor:cookiesConsentChange', function (visitorCookiesConsent) {
-    console.log(visitorCookiesConsent);
-  });
+// Web SDK get
+window.iAdvizeInternals.push({
+  method: 'get',
+  args: ['visitor:cookiesConsent'],
 });
 ```
