@@ -46,7 +46,7 @@ const isLogout = (
   data: iAdvizeInterfaceParameters,
 ): data is iAdvizeInterfaceParametersLogout => data.method === 'logout';
 
-const isOn = (
+const isOnOff = (
   data: iAdvizeInterfaceParameters,
 ): data is iAdvizeInterfaceParametersOn =>
   data.method === 'on' || data.method === 'off';
@@ -63,35 +63,29 @@ export function initIAdvizeIframe(websiteId: number, platform = 'ha') {
     'message',
     ({ data }: { data: iAdvizeInterfaceParameters }) => {
       // Internal methods forwarding
-      if (isInternal(data)) {
-        const { method, args } = data;
-        window.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
-          iAdvize[method](...args),
-        );
-      }
-
       if (isActivate(data)) {
         const { command, method, args } = data;
         window.iAdvizeInterface.push(async (iAdvize: IAdvizeGlobal) => {
           const activation = await iAdvize.activate(() => args);
           window.parent.postMessage({ command, method, activation }, '*');
         });
-      }
-
-      if (isLogout(data)) {
+      } else if (isLogout(data)) {
         const { command, method } = data;
         window.iAdvizeInterface.push(async (iAdvize: IAdvizeGlobal) => {
           const logout = await iAdvize.logout();
           window.parent.postMessage({ command, method, logout }, '*');
         });
-      }
-
-      if (isOn(data)) {
+      } else if (isOnOff(data)) {
         const { command, method, args } = data;
         window.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
           iAdvize[method](...args, (value: unknown) =>
             window.parent.postMessage({ command, method, value }, '*'),
           ),
+        );
+      } else if (isInternal(data)) {
+        const { method, args } = data;
+        window.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
+          iAdvize[method](...args),
         );
       }
 

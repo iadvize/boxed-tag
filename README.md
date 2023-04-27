@@ -121,11 +121,9 @@ window.iAdvizeInternals.push({
 // Web SDK activate anonymous
 window.iAdvizeInternals.push({
   method: 'activate',
-  args: [
-    JSON.stringify({
-      authenticationOption: { type: 'ANONYMOUS' },
-    }),
-  ],
+  args: {
+    authenticationOption: { type: 'ANONYMOUS' },
+  },
 });
 
 // Web SDK activate secured auth
@@ -134,17 +132,16 @@ const visitor_token = await getToken(); // your backend logic to generate a JWE
 
 window.iAdvizeInternals.push({
   method: 'activate',
-  args: [
-    JSON.stringify({
-      authenticationOption: {
-        type: 'SECURED_AUTHENTICATION',
-        token: visitor_token,
-      },
-    }),
-  ],
+  args: {
+    authenticationOption: {
+      type: 'SECURED_AUTHENTICATION',
+      token: visitor_token,
+    },
+  },
 });
 
-// Listen activate result
+// Listen to activate result
+
 window.addEventListener('message', ({ data: { method, activation } }) => {
   if (method === 'activate') {
     console.log(activation); // activation return object : success or failure
@@ -156,7 +153,8 @@ window.iAdvizeInternals.push({
   method: 'logout',
 });
 
-// Listen logout
+// Listen to logout
+
 window.addEventListener('message', ({ data: { method } }) => {
   if (method === 'logout') {
     // Do something after logout
@@ -169,7 +167,8 @@ window.iAdvizeInternals.push({
   args: ['cookiesConsentChanged'],
 });
 
-// Listen on cookiesConsentChanged result
+// Listen to cookiesConsentChanged result
+
 window.addEventListener('message', ({ data: { method, value } }) => {
   if (method === 'on') {
     console.log(value); // cookiesConsentChanged value
