@@ -131,25 +131,3 @@ window.iAdvizeInternals.push({
   args: ['visitor:GDPRConsent', true],
 });
 ```
-
-## Call web SDK methods from iframe
-
-The web SDK methods can be called normally in the iframe window context.
-
-example:
-
-```js
-// Activate
-window.iAdvizeInterface.push((iAdvize) => {
-  iAdvize.activate(() => ({
-    authenticationOption: { type: 'ANONYMOUS' },
-  }));
-});
-
-// On
-window.iAdvizeInterface.push(function (iAdvize) {
-  iAdvize.on('visitor:cookiesConsentChange', function (visitorCookiesConsent) {
-    console.log(visitorCookiesConsent);
-  });
-});
-```
