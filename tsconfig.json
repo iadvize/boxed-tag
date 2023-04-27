@@ -19,5 +19,5 @@
     "lib": ["dom", "dom.iterable", "esnext"]
   },
   "exclude": ["node_modules"],
-  "include": ["src", "@types", "test/host.test.ts"]
+  "include": ["src", "@types"]
 }
