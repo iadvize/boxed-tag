@@ -6,6 +6,9 @@ declare global {
     iAdvizeInterface: {
       config: Record<string, unknown>;
       push: (arg: Function) => void;
+    } & Array<Function>;
+    iAdvizeInternals: {
+      push: (param: { method: string; args?: unknown }) => void;
     };
 
     // Parent host dimensions, to support the iAdvize Sandboxed Tag
