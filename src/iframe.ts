@@ -79,14 +79,15 @@ export function initIAdvizeIframe(websiteId: number, platform = 'ha') {
         const { command, method, args } = data;
         window.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
           iAdvize[method](...args, (value: unknown) =>
-            window.parent.postMessage({ command, method, value }, '*'),
+            window.parent.postMessage({ command, method, args, value }, '*'),
           ),
         );
       } else if (isInternal(data)) {
-        const { method, args } = data;
-        window.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
-          iAdvize[method](...args),
-        );
+        const { command, method, args } = data;
+        window.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) => {
+          const value = iAdvize[method](...args);
+          window.parent.postMessage({ command, method, args, value }, '*');
+        });
       }
 
       // Sharing the main window dimension, for sizing and positionning

@@ -111,7 +111,6 @@ example:
 ```js
 // Init iAdvizeInternals
 initIAdvizeHost('myIframeId');
-
 // Web SDK navigate
 window.iAdvizeInternals.push({
   method: 'navigate',
@@ -141,7 +140,6 @@ window.iAdvizeInternals.push({
 });
 
 // Listen to activate result
-
 window.addEventListener('message', ({ data: { method, activation } }) => {
   if (method === 'activate') {
     console.log(activation); // activation return object : success or failure
@@ -154,7 +152,6 @@ window.iAdvizeInternals.push({
 });
 
 // Listen to logout
-
 window.addEventListener('message', ({ data: { method } }) => {
   if (method === 'logout') {
     // Do something after logout
@@ -164,13 +161,12 @@ window.addEventListener('message', ({ data: { method } }) => {
 // Web SDK on
 window.iAdvizeInternals.push({
   method: 'on',
-  args: ['cookiesConsentChanged'],
+  args: ['visitor:cookiesConsentChanged'],
 });
 
 // Listen to cookiesConsentChanged result
-
-window.addEventListener('message', ({ data: { method, value } }) => {
-  if (method === 'on') {
+window.addEventListener('message', ({ data: { method, args, value } }) => {
+  if (method === 'on' && args.includes('visitor:cookiesConsentChanged')) {
     console.log(value); // cookiesConsentChanged value
   }
 });
@@ -178,7 +174,7 @@ window.addEventListener('message', ({ data: { method, value } }) => {
 // Web SDK off
 window.iAdvizeInternals.push({
   method: 'off',
-  args: ['cookiesConsentChanged'],
+  args: ['visitor:cookiesConsentChanged'],
 });
 
 // Web SDK set
@@ -191,5 +187,12 @@ window.iAdvizeInternals.push({
 window.iAdvizeInternals.push({
   method: 'get',
   args: ['visitor:cookiesConsent'],
+});
+
+// Listen to cookiesConsent get
+window.addEventListener('message', ({ data: { method, args, value } }) => {
+  if (method === 'get' && args.includes('visitor:cookiesConsent')) {
+    console.log(value); // cookiesConsentChanged value
+  }
 });
 ```
