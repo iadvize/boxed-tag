@@ -3,13 +3,13 @@
  */
 
 // Web SDK navigate
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'navigate',
   args: [window.location.href],
 });
 
 // Web SDK activate anonymous
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: { type: 'ANONYMOUS' },
@@ -20,7 +20,7 @@ window.iAdvizeInternals.push({
 const getToken = new Promise((resolve) => resolve('myToken'));
 const visitor_token = await getToken(); // your backend logic to generate a JWE
 
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: {
@@ -38,7 +38,7 @@ window.addEventListener('message', ({ data: { method, activation } }) => {
 });
 
 // Web SDK logout
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'logout',
 });
 
@@ -50,7 +50,7 @@ window.addEventListener('message', ({ data: { method } }) => {
 });
 
 // Web SDK on
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'on',
   args: ['visitor:cookiesConsentChanged'],
 });
@@ -63,19 +63,19 @@ window.addEventListener('message', ({ data: { method, args, value } }) => {
 });
 
 // Web SDK off
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'off',
   args: ['visitor:cookiesConsentChanged'],
 });
 
 // Web SDK set
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'set',
   args: ['visitor:GDPRConsent', true],
 });
 
 // Web SDK get
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'get',
   args: ['visitor:cookiesConsent'],
 });

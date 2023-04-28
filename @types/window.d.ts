@@ -7,7 +7,7 @@ declare global {
       config: Record<string, unknown>;
       push: (arg: Function) => void;
     } & Array<Function>;
-    iAdvizeInternals: {
+    iAdvizeSandboxedInterface: {
       push: (param: { method: string; args?: unknown }) => void;
     };
 

@@ -101,7 +101,7 @@ window.addEventListener('message', ({ data: { foo } }) => {
 ## Call web SDK methods from host
 
 Web SDK methods cannot be called from host context because the iAdvize tag is isolated in the iframe. So we need to tell the iframe what we want to call.  
-After having called `initIAdvizeHost`, a `iAdvizeInternals` object is available in the host window context.  
+After having called `initIAdvizeHost`, a `iAdvizeSandboxedInterface` object is available in the host window context.  
 This object sends the `method` name and `args` to the iframe, that will call the web SDK.
 The `activate` and `on` methods can return a value to the host :  
 to retrieve it, add a `window.addEventListener("message")` and check the `e.date.method` property to recognize the method called.
@@ -109,16 +109,16 @@ to retrieve it, add a `window.addEventListener("message")` and check the `e.date
 example:
 
 ```js
-// Init iAdvizeInternals
+// Init iAdvizeSandboxedInterface
 initIAdvizeHost('myIframeId');
 // Web SDK navigate
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'navigate',
   args: [window.location.href],
 });
 
 // Web SDK activate anonymous
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: { type: 'ANONYMOUS' },
@@ -129,7 +129,7 @@ window.iAdvizeInternals.push({
 const getToken = new Promise((resolve) => resolve('myToken'));
 const visitor_token = await getToken(); // your backend logic to generate a JWE
 
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: {
@@ -147,7 +147,7 @@ window.addEventListener('message', ({ data: { method, activation } }) => {
 });
 
 // Web SDK logout
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'logout',
 });
 
@@ -159,7 +159,7 @@ window.addEventListener('message', ({ data: { method } }) => {
 });
 
 // Web SDK on
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'on',
   args: ['visitor:cookiesConsentChanged'],
 });
@@ -172,19 +172,19 @@ window.addEventListener('message', ({ data: { method, args, value } }) => {
 });
 
 // Web SDK off
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'off',
   args: ['visitor:cookiesConsentChanged'],
 });
 
 // Web SDK set
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'set',
   args: ['visitor:GDPRConsent', true],
 });
 
 // Web SDK get
-window.iAdvizeInternals.push({
+window.iAdvizeSandboxedInterface.push({
   method: 'get',
   args: ['visitor:cookiesConsent'],
 });
@@ -192,7 +192,7 @@ window.iAdvizeInternals.push({
 // Listen to cookiesConsent get
 window.addEventListener('message', ({ data: { method, args, value } }) => {
   if (method === 'get' && args.includes('visitor:cookiesConsent')) {
-    console.log(value); // cookiesConsentChanged value
+    console.log(value); // cookiesConsent value
   }
 });
 ```
