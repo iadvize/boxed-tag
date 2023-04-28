@@ -6,6 +6,14 @@ type HostWindow = {
   iAdvizeInternals: IAdvizeInternals;
 };
 
+type IframePositioning = {
+  width: number;
+  height: number;
+  left?: number;
+  right?: number;
+  bottom?: number;
+};
+
 const hostWindow = window as unknown as HostWindow;
 hostWindow.iAdvizeInternals = [];
 
@@ -14,6 +22,29 @@ hostWindow.iAdvizeInternals.push({
   method: 'navigate',
   args: [window.location.href],
 });
+
+export function resizeIFrame(
+  iAdvizeSandbox: HTMLIFrameElement,
+  data: IframePositioning,
+) {
+  if (data.width !== undefined && data.height !== undefined) {
+    const iframe = iAdvizeSandbox;
+    const { width, height, left, right, bottom } = data;
+    const shouldReset = width === 0 && height === 0;
+    if (shouldReset) {
+      iframe.style.pointerEvents = 'none';
+      iframe.style.width = '100vw';
+      iframe.style.height = '100vh';
+      return;
+    }
+    iframe.style.pointerEvents = 'inherit';
+    iframe.style.width = `${width}px`;
+    iframe.style.height = `${height}px`;
+    iframe.style.bottom = `${bottom}px`;
+    if (left) iframe.style.left = `${left}px`;
+    else iframe.style.right = `${right}px`;
+  }
+}
 
 export function initIAdvizeHost(sandboxId: string): void {
   const iAdvizeSandbox = document.getElementById(
@@ -66,21 +97,6 @@ export function initIAdvizeHost(sandboxId: string): void {
     if (e.source !== iAdvizeSandbox.contentWindow) {
       return;
     }
-    if (e.data.width !== undefined && e.data.height !== undefined) {
-      const { width, height, left, right, bottom } = e.data;
-      const shouldReset = width === 0 && height === 0;
-      if (shouldReset) {
-        iAdvizeSandbox.style.pointerEvents = 'none';
-        iAdvizeSandbox.style.width = '100vw';
-        iAdvizeSandbox.style.height = '100vh';
-        return;
-      }
-      iAdvizeSandbox.style.pointerEvents = 'inherit';
-      iAdvizeSandbox.style.width = `${width}px`;
-      iAdvizeSandbox.style.height = `${height}px`;
-      iAdvizeSandbox.style.bottom = `${bottom}px`;
-      if (left) iAdvizeSandbox.style.left = `${left}px`;
-      else iAdvizeSandbox.style.right = `${right}px`;
-    }
+    resizeIFrame(iAdvizeSandbox, e.data);
   });
 }

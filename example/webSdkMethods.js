@@ -52,12 +52,12 @@ window.addEventListener('message', ({ data: { method } }) => {
 // Web SDK on
 window.iAdvizeInternals.push({
   method: 'on',
-  args: ['cookiesConsentChanged'],
+  args: ['visitor:cookiesConsentChanged'],
 });
 
 // Listen to cookiesConsentChanged result
-window.addEventListener('message', ({ data: { method, value } }) => {
-  if (method === 'on') {
+window.addEventListener('message', ({ data: { method, args, value } }) => {
+  if (method === 'on' && args.includes('visitor:cookiesConsentChanged')) {
     console.log(value); // cookiesConsentChanged value
   }
 });
@@ -65,7 +65,7 @@ window.addEventListener('message', ({ data: { method, value } }) => {
 // Web SDK off
 window.iAdvizeInternals.push({
   method: 'off',
-  args: ['cookiesConsentChanged'],
+  args: ['visitor:cookiesConsentChanged'],
 });
 
 // Web SDK set
@@ -78,4 +78,11 @@ window.iAdvizeInternals.push({
 window.iAdvizeInternals.push({
   method: 'get',
   args: ['visitor:cookiesConsent'],
+});
+
+// Listen to cookiesConsent get
+window.addEventListener('message', ({ data: { method, args, value } }) => {
+  if (method === 'get' && args.includes('visitor:cookiesConsent')) {
+    console.log(value); // cookiesConsent value
+  }
 });

@@ -51,48 +51,54 @@ const isOnOff = (
 ): data is iAdvizeInterfaceParametersOn =>
   data.method === 'on' || data.method === 'off';
 
-export function initIAdvizeIframe(websiteId: number, platform = 'ha') {
+export function initIAdvizeIframe(
+  websiteId: number,
+  platform = 'ha',
+  context = window,
+) {
   // iAdvize configuration
-  window.iAdvizeInterface = window.iAdvizeInterface || [];
-  window.iAdvizeInterface.config = {
+  context.iAdvizeInterface = context.iAdvizeInterface || [];
+  context.iAdvizeInterface.config = {
     sid: websiteId,
     mode: 'sandboxed',
   };
 
-  window.addEventListener(
+  context.addEventListener(
     'message',
     ({ data }: { data: iAdvizeInterfaceParameters }) => {
       // Internal methods forwarding
       if (isActivate(data)) {
         const { command, method, args } = data;
-        window.iAdvizeInterface.push(async (iAdvize: IAdvizeGlobal) => {
+        context.iAdvizeInterface.push(async (iAdvize: IAdvizeGlobal) => {
           const activation = await iAdvize.activate(() => args);
-          window.parent.postMessage({ command, method, activation }, '*');
+          context.parent.postMessage({ command, method, activation }, '*');
         });
       } else if (isLogout(data)) {
         const { command, method } = data;
-        window.iAdvizeInterface.push(async (iAdvize: IAdvizeGlobal) => {
+        context.iAdvizeInterface.push(async (iAdvize: IAdvizeGlobal) => {
           const logout = await iAdvize.logout();
-          window.parent.postMessage({ command, method, logout }, '*');
+          context.parent.postMessage({ command, method, logout }, '*');
         });
       } else if (isOnOff(data)) {
         const { command, method, args } = data;
-        window.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
+        context.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
           iAdvize[method](...args, (value: unknown) =>
-            window.parent.postMessage({ command, method, value }, '*'),
+            context.parent.postMessage({ command, method, args, value }, '*'),
           ),
         );
       } else if (isInternal(data)) {
-        const { method, args } = data;
-        window.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
-          iAdvize[method](...args),
-        );
+        const { command, method, args } = data;
+
+        context.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) => {
+          const value = iAdvize[method](...args);
+          context.parent.postMessage({ command, method, args, value }, '*');
+        });
       }
 
-      // Sharing the main window dimension, for sizing and positionning
+      // Sharing the main context dimension, for sizing and positionning
       const { hostWidth, hostHeight } = data;
       if (hostWidth && hostHeight) {
-        window.host = {
+        context.host = {
           width: hostWidth,
           height: hostHeight,
         };
@@ -100,10 +106,10 @@ export function initIAdvizeIframe(websiteId: number, platform = 'ha') {
     },
   );
 
-  window.iAdvizeInterface.push(function (iAdvize: IAdvizeGlobal) {
+  context.iAdvizeInterface.push(function (iAdvize: IAdvizeGlobal) {
     // Chatbox sizing
     iAdvize.on('app:boundariesChange', (boundaries: unknown) => {
-      window.parent.postMessage(boundaries, '*');
+      context.parent.postMessage(boundaries, '*');
     });
   });
 
