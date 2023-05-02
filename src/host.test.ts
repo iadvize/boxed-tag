@@ -37,31 +37,31 @@ describe('host', () => {
     initIAdvizeHost('myIframeId');
 
     // Web SDK on
-    window.iAdvizeInternals.push({
+    window.iAdvizeSandboxedInterface.push({
       method: 'on',
       args: ['visitor:cookiesConsentChange'],
     });
 
     // Web SDK off
-    window.iAdvizeInternals.push({
+    window.iAdvizeSandboxedInterface.push({
       method: 'off',
       args: ['visitor:cookiesConsentChange'],
     });
 
     // Web SDK get
-    window.iAdvizeInternals.push({
+    window.iAdvizeSandboxedInterface.push({
       method: 'get',
       args: ['visitor:cookiesConsent'],
     });
 
     // Web SDK set
-    window.iAdvizeInternals.push({
+    window.iAdvizeSandboxedInterface.push({
       method: 'set',
       args: ['visitor:cookiesConsent', true],
     });
 
     // Web SDK activate
-    window.iAdvizeInternals.push({
+    window.iAdvizeSandboxedInterface.push({
       method: 'activate',
       args: {
         authenticationOption: {
