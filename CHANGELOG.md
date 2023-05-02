@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Refact iAdvizeInternals function name
+-   Refact iAdvizeInternals function name
 
 ## [0.2.2]
 
