@@ -70,7 +70,7 @@ export function getActivateAuthToken(context: Window): Promise<string> {
     // Listen once set-activate-auth-token from host. The listener is then removed.
     context.addEventListener(
       'message',
-      ({ data: { method, token } }) => {
+      ({ data: { method, args: token } }) => {
         if (method === 'set-activate-auth-token') {
           resolve(token);
         }

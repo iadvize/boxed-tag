@@ -17,15 +17,12 @@ window.iAdvizeSandboxedInterface.push({
 });
 
 // Web SDK activate secured auth
-const getToken = new Promise((resolve) => resolve('myToken'));
-const visitor_token = await getToken(); // your backend logic to generate a JWE
-
+const getJweToken = Promise.resolve('myJWEToken'); // your backend logic to generate a JWE token
 window.iAdvizeSandboxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: {
       type: 'SECURED_AUTHENTICATION',
-      token: visitor_token,
     },
   },
 });
@@ -34,6 +31,14 @@ window.iAdvizeSandboxedInterface.push({
 window.addEventListener('message', ({ data: { method, activation } }) => {
   if (method === 'activate') {
     console.log(activation); // activation return object : success or failure
+  }
+  if (method === 'get-activate-auth-token') {
+    getJweToken().then((token) =>
+      window.iAdvizeSandboxedInterface.push({
+        method: 'set-activate-auth-token',
+        args: `${token}`,
+      }),
+    );
   }
 });
 
