@@ -19,7 +19,16 @@ type iAdvizeInterfaceParametersInternals = {
 type iAdvizeInterfaceParametersActivate = {
   command: 'internals';
   method: 'activate';
-  args: Record<string, unknown>;
+  args: {
+    authenticationOption:
+      | {
+          type: 'ANONYMOUS_AUTHENTICATION';
+        }
+      | {
+          type: 'SECURED_AUTHENTICATION';
+          token: string;
+        };
+  };
 } & iAdvizeInterfaceParameters;
 
 type iAdvizeInterfaceParametersLogout = {
@@ -51,6 +60,26 @@ const isOnOff = (
 ): data is iAdvizeInterfaceParametersOn =>
   data.method === 'on' || data.method === 'off';
 
+export function getActivateAuthToken(context: Window): Promise<string> {
+  context.parent.postMessage(
+    { command: 'internals', method: 'get-activate-auth-token' },
+    '*',
+  );
+
+  return new Promise((resolve) => {
+    // Listen once set-activate-auth-token from host. The listener is then removed.
+    context.addEventListener(
+      'message',
+      ({ data: { method, args: token } }) => {
+        if (method === 'set-activate-auth-token') {
+          resolve(token);
+        }
+      },
+      { once: true },
+    );
+  });
+}
+
 export function initIAdvizeIframe(
   websiteId: number,
   platform = 'ha',
@@ -68,9 +97,26 @@ export function initIAdvizeIframe(
     ({ data }: { data: iAdvizeInterfaceParameters }) => {
       // Internal methods forwarding
       if (isActivate(data)) {
-        const { command, method, args } = data;
+        const {
+          command,
+          method,
+          args: {
+            authenticationOption: { type },
+          },
+        } = data;
         context.iAdvizeInterface.push(async (iAdvize: IAdvizeGlobal) => {
-          const activation = await iAdvize.activate(() => args);
+          const activation = await iAdvize.activate(async () => {
+            const token =
+              type === 'SECURED_AUTHENTICATION'
+                ? await getActivateAuthToken(context)
+                : null;
+            return {
+              authenticationOption: {
+                type,
+                token,
+              },
+            };
+          });
           context.parent.postMessage({ command, method, activation }, '*');
         });
       } else if (isLogout(data)) {

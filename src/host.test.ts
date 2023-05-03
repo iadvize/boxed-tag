@@ -4,7 +4,6 @@ import { initIAdvizeIframe } from './iframe';
 describe('host', () => {
   afterEach(() => document.querySelector('iframe')?.remove());
   it('should call web SDK methods', (done) => {
-    const activateMock = jest.fn();
     const navigateMock = jest.fn();
     const getMock = jest.fn();
     const setMock = jest.fn();
@@ -26,7 +25,7 @@ describe('host', () => {
             get: getMock,
             set: setMock,
             navigate: navigateMock,
-            activate: activateMock,
+            activate: (callback: Function) => callback(),
           });
         });
       }, 200);
@@ -66,39 +65,52 @@ describe('host', () => {
       args: {
         authenticationOption: {
           type: 'SECURED_AUTHENTICATION',
-          token: 'testToken',
         },
       },
     });
 
     // Listen to cookiesConsent get
-    window.addEventListener('message', ({ data: { method, args } }) => {
-      if (method === 'on') {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(onMock).toHaveBeenCalledWith('visitor:cookiesConsentChange');
-      }
-      if (method === 'off') {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(offMock).toHaveBeenCalledWith('visitor:cookiesConsentChange');
-      }
-      if (method === 'navigate') {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(navigateMock).toHaveBeenCalledWith(window.location.href);
-      }
-      if (args?.includes('visitor:cookiesConsent') && method === 'get') {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(getMock).toHaveBeenCalledWith('visitor:cookiesConsent');
-      }
-      if (args?.includes('visitor:cookiesConsent') && method === 'set') {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(setMock).toHaveBeenCalledWith('visitor:cookiesConsent', true);
-      }
-      if (method === 'activate') {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(activateMock).toHaveBeenCalledTimes(1);
-        done();
-      }
-    });
+    window.addEventListener(
+      'message',
+      ({ data: { method, args, activation } }) => {
+        if (method === 'on') {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(onMock).toHaveBeenCalledWith('visitor:cookiesConsentChange');
+        }
+        if (method === 'off') {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(offMock).toHaveBeenCalledWith('visitor:cookiesConsentChange');
+        }
+        if (method === 'navigate') {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(navigateMock).toHaveBeenCalledWith(window.location.href);
+        }
+        if (args?.includes('visitor:cookiesConsent') && method === 'get') {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(getMock).toHaveBeenCalledWith('visitor:cookiesConsent');
+        }
+        if (args?.includes('visitor:cookiesConsent') && method === 'set') {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(setMock).toHaveBeenCalledWith('visitor:cookiesConsent', true);
+        }
+        if (method === 'get-activate-auth-token') {
+          window.iAdvizeSandboxedInterface.push({
+            method: 'set-activate-auth-token',
+            args: `myToken`,
+          });
+        }
+        if (method === 'activate') {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(activation).toEqual({
+            authenticationOption: {
+              token: 'myToken',
+              type: 'SECURED_AUTHENTICATION',
+            },
+          });
+          done();
+        }
+      },
+    );
   });
   it('should resize iframe on window resize', (done) => {
     const iframe = document.createElement('iframe');
