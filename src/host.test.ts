@@ -36,31 +36,31 @@ describe('host', () => {
     initIAdvizeHost('myIframeId');
 
     // Web SDK on
-    window.iAdvizeSandboxedInterface.push({
+    window.iAdvizeBoxedInterface.push({
       method: 'on',
       args: ['visitor:cookiesConsentChange'],
     });
 
     // Web SDK off
-    window.iAdvizeSandboxedInterface.push({
+    window.iAdvizeBoxedInterface.push({
       method: 'off',
       args: ['visitor:cookiesConsentChange'],
     });
 
     // Web SDK get
-    window.iAdvizeSandboxedInterface.push({
+    window.iAdvizeBoxedInterface.push({
       method: 'get',
       args: ['visitor:cookiesConsent'],
     });
 
     // Web SDK set
-    window.iAdvizeSandboxedInterface.push({
+    window.iAdvizeBoxedInterface.push({
       method: 'set',
       args: ['visitor:cookiesConsent', true],
     });
 
     // Web SDK activate
-    window.iAdvizeSandboxedInterface.push({
+    window.iAdvizeBoxedInterface.push({
       method: 'activate',
       args: {
         authenticationOption: {
@@ -94,7 +94,7 @@ describe('host', () => {
           expect(setMock).toHaveBeenCalledWith('visitor:cookiesConsent', true);
         }
         if (method === 'get-activate-auth-token') {
-          window.iAdvizeSandboxedInterface.push({
+          window.iAdvizeBoxedInterface.push({
             method: 'set-activate-auth-token',
             args: `myToken`,
           });

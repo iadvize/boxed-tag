@@ -145,24 +145,14 @@ jobs:
     - name: Extract release changelog
       id: extract-changelog
       if: steps.extract-version-label.outputs.result != 'beta'
-      run: |
-        VERSION=$(cat package.json | jq -r '.version')
-        VERSION_PART=$(sed -n "/## \[$VERSION\]/,/## \[/{/## \[/d;p;}" CHANGELOG.md)
-
-        VERSION_PART="${VERSION_PART//'%'/'%25'}"
-        VERSION_PART="${VERSION_PART//$'\n'/'%0A'}"
-        VERSION_PART="${VERSION_PART//$'\r'/'%0D'}"
-        echo VERSION_PART=$VERSION_PART
-
-        echo "version-part=$VERSION_PART" >> $GITHUB_OUTPUT
-        
+      uses: mikepenz/release-changelog-builder-action@3.7.2
 
     - name: Create Release
       if: steps.extract-version-label.outputs.result != 'beta'
       uses: actions/github-script@v6
       env:
         VERSION: ${{ steps.push.outputs.version }}
-        BODY: ${{ steps.extract-changelog.outputs.version-part }}
+        BODY: ${{ steps.extract-changelog.outputs.changelog }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |

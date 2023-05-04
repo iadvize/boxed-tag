@@ -1,8 +1,8 @@
 {
-  "name": "@iadvize-oss/sandboxed-tag",
+  "name": "@iadvize-oss/boxed-tag",
   "version": "0.3.0",
   "type": "module",
-  "description": "Sandboxed iAdvize tag",
+  "description": "Boxed iAdvize tag",
   "main": "dist/index.js",
   "module": "esm/index.js",
   "types": "dist/index.d.ts",
@@ -17,16 +17,16 @@
     "lint:js": "eslint ./src --ext .js,.jsx,.ts,.tsx,.json,.d.ts --cache",
     "bump-changelog": "VERSION=$(cat package.json | jq '.version') && remark CHANGELOG.md -o --use @jarrodldavis/changelog-version-bump=version:$VERSION && git add CHANGELOG.md"
   },
-  "homepage": "https://github.com/iadvize/sandboxed-tag#readme",
+  "homepage": "https://github.com/iadvize/boxed-tag#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iadvize/sandboxed-tag.git"
+    "url": "git+https://github.com/iadvize/boxed-tag.git"
   },
   "keywords": [
     "iAdvize"
   ],
   "bugs": {
-    "url": "https://github.com/iadvize/sandboxed-tag/issues"
+    "url": "https://github.com/iadvize/boxed-tag/issues"
   },
   "author": "iAdvize developers",
   "license": "MIT",

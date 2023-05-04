@@ -1,10 +1,10 @@
-# Sandboxed tag
+# Boxed tag
 
-The “iAdvize Sandboxed Tag” is a proposal to include the iAdvize Tag in the most secure way, ie. without it having access to the client’s website.
+The “iAdvize Boxed Tag” is a proposal to include the iAdvize Tag in the most secure way, ie. without it having access to the client’s website.
 
 The iAdvize tag can be isolated when loaded from an iframe with the sandbox attribute.
 
-This technique requires :
+This technique requires:
 
 - A html page hosted on a different origin (but on the same top-level domain),
 - A communication channel between the two pages, to handle navigation and the iframe positioning and sizing.
@@ -14,7 +14,7 @@ This technique requires :
 ## Install the lib on your project
 
 ```
-npm i @iadvize-oss/sandboxed-tag
+npm i @iadvize-oss/boxed-tag
 ```
 
 ## Create the iframe script
@@ -27,17 +27,18 @@ The `initIAdvizeIframe` comes with 2 arguments :
 - `iAdvizePlatform` : the iadvize platform (default: ha).
 
 ```js
-import { initIAdvizeIframe } from '@iadvize-oss/sandboxed-tag';
+import { initIAdvizeIframe } from '@iadvize-oss/boxed-tag';
 
 initIAdvizeIframe(<sid>, <iAdvizePlatform>);
 ```
 
-## Add a sandboxed iframe
+## Add a boxed iframe
 
-Add a sanboxed iframe on your site's main page.
+Add a boxed iframe on your site's main page.
 
 ```html
 <iframe
+  title="iAdvize chat notification frame"
   sandbox="allow-scripts allow-same-origin"
   src="https://my-iframe-script-url"
   id="myIframeId"
@@ -50,7 +51,7 @@ Create a js file with the host lib import.
 Then call `initIAdvizeHost` to listen the iframe messages.
 
 ```js
-import { initIAdvizeHost } from '@iadvize-oss/sandboxed-tag';
+import { initIAdvizeHost } from '@iadvize-oss/boxed-tag';
 
 initIAdvizeHost('myIframeId');
 ```
@@ -59,7 +60,7 @@ initIAdvizeHost('myIframeId');
 
 ## From iframe to host
 
-Sending message from the isolated sanboxed iframe to the host window.
+Sending message from the isolated boxed iframe to the host window.
 Use the `iAdvizeInterface` to add callbacks, that will be handled once the iadvize tag is loaded.
 
 ```js
@@ -80,7 +81,7 @@ window.addEventListener('message', (e) => {
 
 ## From host to iframe
 
-Sending message from the host window to the isolated sanboxed iframe.
+Sending message from the host window to the isolated boxed iframe.
 
 ```js
 const iAdvizeSandbox = document.getElementById('myIframeId');
@@ -101,7 +102,7 @@ window.addEventListener('message', ({ data: { foo } }) => {
 ## Call web SDK methods from host
 
 Web SDK methods cannot be called from host context because the iAdvize tag is isolated in the iframe. So we need to tell the iframe what we want to call.  
-After having called `initIAdvizeHost`, a `iAdvizeSandboxedInterface` object is available in the host window context.  
+After having called `initIAdvizeHost`, a `iAdvizeBoxedInterface` object is available in the host window context.  
 This object sends the `method` name and `args` to the iframe, that will call the web SDK.
 The `activate` and `get` and `on` methods can return a value to the host :  
 to retrieve it, add a `window.addEventListener("message")` and check the `e.data.method` property to recognize the method called.
@@ -109,7 +110,7 @@ to retrieve it, add a `window.addEventListener("message")` and check the `e.data
 ### Navigate
 ```js
 // Web SDK navigate
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'navigate',
   args: [window.location.href],
 });
@@ -122,7 +123,7 @@ For an anonymous authentication:
 
 ```js
 // Web SDK activate anonymous
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: { type: 'ANONYMOUS' },
@@ -145,12 +146,12 @@ The JWE token should be generated on the host side and sent to the iframe.
 
 The `get-activate-auth-token` listener allows the iframe to ask for a token refresh if needed.
 
-Example of secured authentication implementation : 
+Example of secured authentication implementation: 
 ```js
 // Web SDK activate secured auth
 const getJweToken = Promise.resolve('myJWEToken');// your backend logic to generate a JWE
 
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: {
@@ -164,7 +165,7 @@ window.addEventListener('message', ({ data: { method, activation } }) => {
   // Handle authentication token
   if (method === 'get-activate-auth-token') {
     getJweToken().then((token) =>
-      window.iAdvizeSandboxedInterface.push({
+      window.iAdvizeBoxedInterface.push({
         method: 'set-activate-auth-token',
         args: `${token}`,
       }),
@@ -183,7 +184,7 @@ The host can listen to the result of the `logout` call.
 Example of implementation:
 ```js
 // Web SDK logout
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'logout',
 });
 
@@ -201,7 +202,7 @@ The host can listen to the result of the `on` call.
 Example of implementation:
 ```js
 // Web SDK on
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'on',
   args: ['visitor:cookiesConsentChanged'],
 });
@@ -217,16 +218,15 @@ window.addEventListener('message', ({ data: { method, args, value } }) => {
 ### Off
 ```js
 // Web SDK off
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'off',
   args: ['visitor:cookiesConsentChanged'],
 });
 ```
 ### Set
 ```js
-### Set
 // Web SDK set
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'set',
   args: ['visitor:GDPRConsent', true],
 });
@@ -237,7 +237,7 @@ The host can listen to the result of the `get` call.
 Example of implementation:
 ```js
 // Web SDK get
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'get',
   args: ['visitor:cookiesConsent'],
 });

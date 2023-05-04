@@ -1,3 +1,3 @@
-import { initIAdvizeHost } from '@iadvize-oss/sandboxed-tag';
+import { initIAdvizeHost } from '@iadvize-oss/boxed-tag';
 
 initIAdvizeHost('myIframeId');
