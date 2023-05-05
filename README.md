@@ -1,13 +1,9 @@
 # Boxed tag
 
-The “iAdvize Boxed Tag” is a proposal to include the iAdvize Tag in the most secure way, ie. without it having access to the client’s website.
+The “iAdvize Boxed Tag” is a way to include the iAdvize Tag in the most secure way, without it having access to the client’s website.
 
-The iAdvize tag can be isolated when loaded from an iframe with the sandbox attribute.
-
-This technique requires:
-
-- A html page hosted on a different origin (but on the same top-level domain),
-- A communication channel between the two pages, to handle navigation and the iframe positioning and sizing.
+With this solution, the iAdvize tag can be loaded in an isolated box (a sandboxed iframe).
+This way, the main page context cannot be accessed by the iAdvize tag: the main page only sends controlled, relevant data to the boxed tag.
 
 # Installation
 

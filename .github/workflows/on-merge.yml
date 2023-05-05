@@ -142,17 +142,11 @@ jobs:
             production_environment: true,
           });
 
-    - name: Extract release changelog
-      id: extract-changelog
-      if: steps.extract-version-label.outputs.result != 'beta'
-      uses: mikepenz/release-changelog-builder-action@v3.7.2
-
     - name: Create Release
       if: steps.extract-version-label.outputs.result != 'beta'
       uses: actions/github-script@v6
       env:
         VERSION: ${{ steps.push.outputs.version }}
-        BODY: ${{ steps.extract-changelog.outputs.changelog }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
@@ -161,7 +155,7 @@ jobs:
             repo: context.repo.repo,
             tag_name: `v${process.env.VERSION}`,
             name: process.env.TAG,
-            body: process.env.BODY,
+            generate_release_notes: true,
             draft: false,
             prerelease: false,
           })
