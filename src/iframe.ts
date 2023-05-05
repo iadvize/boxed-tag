@@ -1,3 +1,5 @@
+import { CustomDataValues } from './shared/types';
+
 type IAdvizeGlobal = {
   [key: string]: Function;
 };
@@ -8,6 +10,7 @@ type iAdvizeInterfaceParameters = {
   args: unknown;
   hostHeight: number;
   hostWidth: number;
+  customDataValues: CustomDataValues;
 };
 
 type iAdvizeInterfaceParametersInternals = {
@@ -142,12 +145,19 @@ export function initIAdvizeIframe(
       }
 
       // Sharing the main context dimension, for sizing and positionning
-      const { hostWidth, hostHeight } = data;
+      const { hostWidth, hostHeight, customDataValues } = data;
       if (hostWidth && hostHeight) {
         context.host = {
           width: hostWidth,
           height: hostHeight,
         };
+      }
+
+      // Send custom data values to the iAdvize tag
+      if (customDataValues) {
+        context.iAdvizeInterface.push(function (iAdvize: IAdvizeGlobal) {
+          iAdvize.set('app:customDataValues', customDataValues);
+        });
       }
     },
   );
@@ -156,6 +166,10 @@ export function initIAdvizeIframe(
     // Chatbox sizing
     iAdvize.on('app:boundariesChange', (boundaries: unknown) => {
       context.parent.postMessage(boundaries, '*');
+    });
+    // Get HTML custom data
+    iAdvize.on('app:customDataSelectorsChange', (selectors: string[]) => {
+      context.parent.postMessage({ customDataSelectors: selectors }, '*');
     });
   });
 
