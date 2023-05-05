@@ -145,7 +145,7 @@ jobs:
     - name: Extract release changelog
       id: extract-changelog
       if: steps.extract-version-label.outputs.result != 'beta'
-      uses: mikepenz/release-changelog-builder-action@3.7.2
+      uses: mikepenz/release-changelog-builder-action@v3.7.2
 
     - name: Create Release
       if: steps.extract-version-label.outputs.result != 'beta'
