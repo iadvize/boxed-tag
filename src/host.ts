@@ -1,9 +1,9 @@
-type IAdvizeSandboxedInterfaceParams = { method: string; args: unknown[] };
+type IAdvizeBoxedInterfaceParams = { method: string; args: unknown[] };
 
-type IAdvizeSandboxedInterface = Array<IAdvizeSandboxedInterfaceParams>;
+type IAdvizeBoxedInterface = Array<IAdvizeBoxedInterfaceParams>;
 
 type HostWindow = {
-  iAdvizeSandboxedInterface: IAdvizeSandboxedInterface;
+  iAdvizeBoxedInterface: IAdvizeBoxedInterface;
 };
 
 type IframePositioning = {
@@ -15,10 +15,10 @@ type IframePositioning = {
 };
 
 const hostWindow = window as unknown as HostWindow;
-hostWindow.iAdvizeSandboxedInterface = [];
+hostWindow.iAdvizeBoxedInterface = [];
 
 // URL forwarding
-hostWindow.iAdvizeSandboxedInterface.push({
+hostWindow.iAdvizeBoxedInterface.push({
   method: 'navigate',
   args: [window.location.href],
 });
@@ -71,9 +71,9 @@ export function initIAdvizeHost(sandboxId: string): void {
 
   iAdvizeSandbox.onload = () => {
     // Internal methods forwarding
-    const buffer = [...hostWindow.iAdvizeSandboxedInterface];
-    hostWindow.iAdvizeSandboxedInterface = Object.assign([], {
-      push: ({ method, args }: IAdvizeSandboxedInterfaceParams): number => {
+    const buffer = [...hostWindow.iAdvizeBoxedInterface];
+    hostWindow.iAdvizeBoxedInterface = Object.assign([], {
+      push: ({ method, args }: IAdvizeBoxedInterfaceParams): number => {
         iAdvizeSandbox.contentWindow!.postMessage(
           {
             command: 'internals',
@@ -82,11 +82,11 @@ export function initIAdvizeHost(sandboxId: string): void {
           },
           '*',
         );
-        return hostWindow.iAdvizeSandboxedInterface.length;
+        return hostWindow.iAdvizeBoxedInterface.length;
       },
     });
     // Execute bufferized methods
-    buffer.forEach((item) => hostWindow.iAdvizeSandboxedInterface.push(item));
+    buffer.forEach((item) => hostWindow.iAdvizeBoxedInterface.push(item));
 
     // Send dimensions
     forwardWindowDimensions();

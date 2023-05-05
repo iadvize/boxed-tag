@@ -3,13 +3,13 @@
  */
 
 // Web SDK navigate
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'navigate',
   args: [window.location.href],
 });
 
 // Web SDK activate anonymous
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: { type: 'ANONYMOUS' },
@@ -18,7 +18,7 @@ window.iAdvizeSandboxedInterface.push({
 
 // Web SDK activate secured auth
 const getJweToken = Promise.resolve('myJWEToken'); // your backend logic to generate a JWE token
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'activate',
   args: {
     authenticationOption: {
@@ -34,7 +34,7 @@ window.addEventListener('message', ({ data: { method, activation } }) => {
   }
   if (method === 'get-activate-auth-token') {
     getJweToken().then((token) =>
-      window.iAdvizeSandboxedInterface.push({
+      window.iAdvizeBoxedInterface.push({
         method: 'set-activate-auth-token',
         args: `${token}`,
       }),
@@ -43,7 +43,7 @@ window.addEventListener('message', ({ data: { method, activation } }) => {
 });
 
 // Web SDK logout
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'logout',
 });
 
@@ -55,7 +55,7 @@ window.addEventListener('message', ({ data: { method } }) => {
 });
 
 // Web SDK on
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'on',
   args: ['visitor:cookiesConsentChanged'],
 });
@@ -68,19 +68,19 @@ window.addEventListener('message', ({ data: { method, args, value } }) => {
 });
 
 // Web SDK off
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'off',
   args: ['visitor:cookiesConsentChanged'],
 });
 
 // Web SDK set
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'set',
   args: ['visitor:GDPRConsent', true],
 });
 
 // Web SDK get
-window.iAdvizeSandboxedInterface.push({
+window.iAdvizeBoxedInterface.push({
   method: 'get',
   args: ['visitor:cookiesConsent'],
 });
