@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Add a Web bundle for <script> consumers 
+-   Add a Web bundle for <script> consumers 
+
 ## [1.0.1]
 
 ### Fixed
