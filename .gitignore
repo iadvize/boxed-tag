@@ -1,6 +1,7 @@
 node_modules/
 esm/
 dist/
+web/
 coverage/
 gh-pages-content/
 .eslintcache
