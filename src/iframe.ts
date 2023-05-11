@@ -164,3 +164,8 @@ export function initIAdvizeIframe(
   script.src = `//${platform}.iadvize.com/iadvize.js`;
   document.body.appendChild(script);
 }
+// Expose function to consume in <script>
+if (window) {
+  // @ts-expect-error: global export
+  window.initIAdvizeIframe = initIAdvizeIframe;
+}
