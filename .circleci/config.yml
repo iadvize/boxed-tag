@@ -1,0 +1,137 @@
+version: 2.1
+
+references:
+  iadvize-docker-credentials: &iadvize-docker-credentials
+    auth:
+      username: $DOCKER_USERNAME
+      password: $DOCKER_PASSWORD
+
+
+  filters-only-tag: &filters-only-tag
+    tags:
+      only: /.*/
+    branches:
+      ignore: /.*/
+      
+  filters-all-branches: &filters-all-branches
+    tags:
+      ignore: /.*/
+    branches:
+      only: /.*/
+
+  filters-all-branches-and-tags: &filters-all-branches-and-tags
+    branches:
+      only: /.*/
+    tags:
+      only: /[0-9]+(\.[0-9]+)*/
+
+  persist-workspace: &persist-workspace
+    persist_to_workspace:
+      root: ~/node
+      paths:
+        - boxed-tag
+
+  restore-workspace: &restore-workspace
+      attach_workspace:
+        at: ~/node
+
+defaults: &defaults
+  working_directory: ~/node/boxed-tag
+
+executors:
+  nodejs:
+    docker:
+      - image: iadvize/builder-front:16
+        <<: *iadvize-docker-credentials
+    working_directory: ~/node/boxed-tag
+    environment:
+      NODE_OPTIONS: --max_old_space_size=2048
+
+  iadvize-docker:
+    docker:
+      - image: iadvize/builder:docker-17.06-git
+        <<: *iadvize-docker-credentials
+
+jobs:
+  install:
+    <<: *defaults
+    executor: nodejs
+    steps:
+      - checkout
+      - run:
+          name: "npm ci"
+          command: npm ci
+      - *persist-workspace
+
+  build:
+    <<: *defaults
+    executor: nodejs
+    steps:
+      - *restore-workspace
+      - run: npm run build
+      - *persist-workspace
+
+
+  test:
+    <<: *defaults
+    executor: nodejs
+    steps:
+      - *restore-workspace
+      - run:
+          name: "Test JS"
+          command: npm test
+
+  lint:
+    <<: *defaults
+    executor: nodejs
+    steps:
+      - *restore-workspace
+      - run:
+          name: "Lint JS"
+          command: npm run lint
+
+
+  upload-s3:
+    <<: *defaults
+    machine:
+      image: ubuntu-2004:202201-02
+    steps:
+      - *restore-workspace
+      - run: .circleci/uploadS3.sh
+
+workflows:
+  version: 2
+  build-test-upload:
+    jobs:
+      - install:
+          context: org-global
+          filters:
+            <<: *filters-all-branches-and-tags
+
+      - test:
+          context: org-global
+          requires:
+            - install
+          filters:
+            <<: *filters-all-branches
+
+      - lint:
+          context: org-global
+          requires:
+            - install
+          filters:
+            <<: *filters-all-branches
+
+      - build:
+          context: org-global
+          requires:
+            - install
+          filters:
+            <<: *filters-all-branches-and-tags
+
+      - upload-s3:
+          context: org-global
+          requires:
+            - build
+          filters:
+            <<: *filters-only-tag

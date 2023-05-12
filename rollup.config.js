@@ -19,8 +19,9 @@ export default [
       {
         dir: 'web',
         format: 'iife',
-        plugins: [terser()]
-      }
+        plugins: [terser()],
+        name: 'iAdvizeBoxedTag',
+      },
     ],
   },
 ];
