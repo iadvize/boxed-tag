@@ -28,7 +28,9 @@ window.iAdvizeBoxedInterface.push({
 });
 
 // Listen to activate result
-window.addEventListener('message', ({ data: { method, activation } }) => {
+window.addEventListener('message', ({ data: { method, activation }, origin }) => {
+  if (origin !== "https://myIframeUrl") return;
+
   if (method === 'activate') {
     console.log(activation); // activation return object : success or failure
   }
@@ -48,7 +50,9 @@ window.iAdvizeBoxedInterface.push({
 });
 
 // Listen to logout
-window.addEventListener('message', ({ data: { method } }) => {
+window.addEventListener('message', ({ data: { method }, origin }) => {
+  if (origin !== "https://myIframeUrl") return;
+
   if (method === 'logout') {
     // Do something after logout
   }
@@ -61,7 +65,9 @@ window.iAdvizeBoxedInterface.push({
 });
 
 // Listen to cookiesConsentChanged result
-window.addEventListener('message', ({ data: { method, args, value } }) => {
+window.addEventListener('message', ({ data: { method, args, value }, origin }) => {
+  if (origin !== "https://myIframeUrl") return;
+
   if (method === 'on' && args.includes('visitor:cookiesConsentChanged')) {
     console.log(value); // cookiesConsentChanged value
   }
@@ -86,7 +92,9 @@ window.iAdvizeBoxedInterface.push({
 });
 
 // Listen to cookiesConsent get
-window.addEventListener('message', ({ data: { method, args, value } }) => {
+window.addEventListener('message', ({ data: { method, args, value }, origin }) => {
+  if (origin !== "https://myIframeUrl") return;
+
   if (method === 'get' && args.includes('visitor:cookiesConsent')) {
     console.log(value); // cookiesConsent value
   }
