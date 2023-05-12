@@ -53,27 +53,14 @@ initIAdvizeHost('myIframeId');
 ```
 
 # Communication
+The only way to start a communication between the host and the sandboxed iframe is the `window.postMessage` method provided by the navigators (see https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage).
+> **warning**
+> The postMessage data is serialized, so functions cannot be sent (see https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage#parameters).
 
-## From iframe to host
+Then, the target of the postMessage calls can listen the events with `window.addEventListener('message')`.
+> **warning**
+> The source of the event should be checked to avoid conflicts and security concerns (see https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage#security_concerns).
 
-Sending message from the isolated boxed iframe to the host window.
-Use the `iAdvizeInterface` to add callbacks, that will be handled once the iadvize tag is loaded.
-
-```js
-window.iAdvizeInterface.push(function () {
-  window.parent.postMessage({ foo: 'bar' });
-});
-```
-
-Receiving message on the main host page.
-
-```js
-window.addEventListener('message', (e) => {
-  if (e.data.foo) {
-    // Do something with the data sent
-  }
-});
-```
 
 ## From host to iframe
 
@@ -91,7 +78,31 @@ Receiving message on the iframe
 
 ```js
 window.addEventListener('message', ({ data: { foo } }) => {
+  if (event.origin !== "http://myHostUrl") return;
   // Do something with the data sent
+});
+```
+
+## From iframe to host
+
+Sending message from the isolated boxed iframe to the host window.
+Use the `iAdvizeInterface` to add callbacks, that will be handled once the iadvize tag is loaded.
+
+```js
+window.iAdvizeInterface.push(function () {
+  window.parent.postMessage({ foo: 'bar' });
+});
+```
+
+Receiving message on the main host page.
+
+```js
+window.addEventListener('message', (e) => {
+  if (event.origin !== "http://myIframeUrl") return;
+
+  if (e.data.foo) {
+    // Do something with the data sent
+  }
 });
 ```
 
