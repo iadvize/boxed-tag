@@ -101,12 +101,12 @@ jobs:
 
 workflows:
   version: 2
-  build-test-upload:
+  build-test:
     jobs:
       - install:
           context: org-global
           filters:
-            <<: *filters-all-branches-and-tags
+            <<: *filters-all-branches
 
       - test:
           context: org-global
@@ -127,7 +127,20 @@ workflows:
           requires:
             - install
           filters:
-            <<: *filters-all-branches-and-tags
+            <<: *filters-all-branches
+  upload:
+    jobs:
+      - install:
+          context: org-global
+          filters:
+            <<: *filters-only-tag
+
+      - build:
+          context: org-global
+          requires:
+            - install
+          filters:
+            <<: *filters-only-tag
 
       - upload-s3:
           context: org-global
