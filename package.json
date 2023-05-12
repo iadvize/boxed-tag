@@ -14,8 +14,8 @@
   ],
   "scripts": {
     "build": "rm -rf dist esm && rollup -c",
-    "test:js": "jest --coverage",
-    "lint:js": "eslint ./src --ext .js,.jsx,.ts,.tsx,.json,.d.ts --cache",
+    "test": "jest --coverage",
+    "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx,.json,.d.ts --cache",
     "bump-changelog": "VERSION=$(cat package.json | jq '.version') && remark CHANGELOG.md -o --use @jarrodldavis/changelog-version-bump=version:$VERSION && git add CHANGELOG.md"
   },
   "homepage": "https://github.com/iadvize/boxed-tag#readme",
