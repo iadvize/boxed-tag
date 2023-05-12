@@ -35,11 +35,18 @@ Add a boxed iframe on your site's main page.
 ```html
 <iframe
   title="iAdvize chat notification frame"
-  sandbox="allow-scripts allow-same-origin"
+  sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
   src="https://my-iframe-script-url"
   id="myIframeId"
 ></iframe>
 ```
+The iframe is set with the following sandbox parameters:
+| sandbox param  | description                                                    |
+|-------------------|----------------------------------------------------------------|
+| allow-scripts     | Allows the page to run iAdvize tag script.                     |
+| allow-same-origin | Allows the iAdvize tag to access the host cookies and storages |
+| allow-popups      | Allows the iAdvize tag to open links sent by the agent         |
+| allow-forms       | Allows the iAdvize tag to submit the visitor email if needed   |
 
 ## Add the host script on your site's main page
 
@@ -77,8 +84,8 @@ iAdvizeSandbox.onload = function () {
 Receiving message on the iframe
 
 ```js
-window.addEventListener('message', ({ data: { foo } }) => {
-  if (event.origin !== "http://myHostUrl") return;
+window.addEventListener('message', ({ data: { foo }, origin }) => {
+  if (origin !== "https://myHostUrl") return;
   // Do something with the data sent
 });
 ```
@@ -97,10 +104,10 @@ window.iAdvizeInterface.push(function () {
 Receiving message on the main host page.
 
 ```js
-window.addEventListener('message', (e) => {
-  if (event.origin !== "http://myIframeUrl") return;
+window.addEventListener('message', ({ data: { foo }, origin }) => {
+  if (origin !== "https://myIframeUrl") return;
 
-  if (e.data.foo) {
+  if (foo) {
     // Do something with the data sent
   }
 });
