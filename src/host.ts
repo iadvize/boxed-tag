@@ -100,9 +100,3 @@ export function initIAdvizeHost(sandboxId: string): void {
     resizeIFrame(iAdvizeSandbox, e.data);
   });
 }
-
-// Expose function to consume in <script>
-if (window) {
-  // @ts-expect-error: global export
-  window.initIAdvizeHost = initIAdvizeHost;
-}

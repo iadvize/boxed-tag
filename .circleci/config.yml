@@ -9,9 +9,15 @@ references:
 
   filters-only-tag: &filters-only-tag
     tags:
-      only: /[0-9]+(\.[0-9]+)*/
+      only: /.*/
     branches:
       ignore: /.*/
+      
+  filters-all-branches: &filters-all-branches
+    tags:
+      ignore: /.*/
+    branches:
+      only: /.*/
 
   filters-all-branches-and-tags: &filters-all-branches-and-tags
     branches:
@@ -91,7 +97,7 @@ jobs:
       image: ubuntu-2004:202201-02
     steps:
       - *restore-workspace
-      - run: ./uploadS3.sh
+      - run: .circleci/uploadS3.sh
 
 workflows:
   version: 2
@@ -107,14 +113,14 @@ workflows:
           requires:
             - install
           filters:
-            <<: *filters-all-branches-and-tags
+            <<: *filters-all-branches
 
       - lint:
           context: org-global
           requires:
             - install
           filters:
-            <<: *filters-all-branches-and-tags
+            <<: *filters-all-branches
 
       - build:
           context: org-global
@@ -128,4 +134,4 @@ workflows:
           requires:
             - build
           filters:
-            <<: *filters-all-branches-and-tags
+            <<: *filters-only-tag

@@ -1,4 +1,4 @@
-VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g')
+VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | awk '{$1=$1};1')
 BUCKET_PATH=s3://idz-prod-main-front-ui-assets/boxed-tag/$VERSION/
 
 echo Pushing to S3 $BUCKET_PATH
