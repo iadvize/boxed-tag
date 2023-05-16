@@ -41,7 +41,7 @@ export function resizeIFrame(
     iframe.style.width = `${width}px`;
     iframe.style.height = `${height}px`;
     iframe.style.bottom = `${bottom}px`;
-    if (left) iframe.style.left = `${left}px`;
+    if (left !== undefined) iframe.style.left = `${left}px`;
     else iframe.style.right = `${right}px`;
   }
 }

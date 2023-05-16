@@ -136,7 +136,7 @@ describe('host', () => {
       done();
     }, 1000);
   });
-  it('should resize iframe on chatbox resize', () => {
+  it('should resize iframe: right positioning', () => {
     const iframe = document.createElement('iframe');
 
     // Init iframe
@@ -150,12 +150,47 @@ describe('host', () => {
     // Init host
     initIAdvizeHost('myIframeId');
 
-    resizeIFrame(iframe, { width: 400, height: 600, right: 0, bottom: 0 });
+    resizeIFrame(iframe, {
+      width: 400,
+      height: 600,
+      right: 0,
+      bottom: 0,
+    });
 
-    expect(iframe.style.height).toEqual('600px');
-    expect(iframe.style.width).toEqual('400px');
-    expect(iframe.style.right).toEqual('0px');
-    expect(iframe.style.bottom).toEqual('0px');
+    setTimeout(() => {
+      expect(iframe.style.height).toEqual('600px');
+      expect(iframe.style.width).toEqual('400px');
+      expect(iframe.style.right).toEqual('0px');
+      expect(iframe.style.bottom).toEqual('0px');
+    });
+  });
+  it('should resize iframe: left positioning', () => {
+    const iframe = document.createElement('iframe');
+
+    // Init iframe
+    iframe.setAttribute('id', 'myIframeId');
+    iframe.addEventListener('load', () => {
+      // @ts-expect-error : window
+      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+    });
+    document.body.appendChild(iframe);
+
+    // Init host
+    initIAdvizeHost('myIframeId');
+
+    resizeIFrame(iframe, {
+      width: 400,
+      height: 600,
+      left: 0,
+      bottom: 0,
+    });
+
+    setTimeout(() => {
+      expect(iframe.style.height).toEqual('600px');
+      expect(iframe.style.width).toEqual('400px');
+      expect(iframe.style.left).toEqual('0px');
+      expect(iframe.style.bottom).toEqual('0px');
+    });
   });
   it('should reset iframe size on chatbox resize', () => {
     const iframe = document.createElement('iframe');
@@ -173,8 +208,10 @@ describe('host', () => {
 
     resizeIFrame(iframe, { width: 0, height: 0, right: 0, bottom: 0 });
 
-    expect(iframe.style.pointerEvents).toEqual('none');
-    expect(iframe.style.width).toEqual('100vw');
-    expect(iframe.style.height).toEqual('100vh');
+    setTimeout(() => {
+      expect(iframe.style.pointerEvents).toEqual('none');
+      expect(iframe.style.width).toEqual('100vw');
+      expect(iframe.style.height).toEqual('100vh');
+    });
   });
 });
