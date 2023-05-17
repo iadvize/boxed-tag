@@ -36,17 +36,25 @@ Add a boxed iframe on your site's main page.
 <iframe
   title="iAdvize chat notification frame"
   sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+  allow="camera;microphone;autoplay"
   src="https://my-iframe-script-url"
   id="myIframeId"
 ></iframe>
 ```
 The iframe is set with the following sandbox parameters:
-| sandbox param  | description                                                    |
+| sandbox param     | description                                                    |
 |-------------------|----------------------------------------------------------------|
 | allow-scripts     | Allows the page to run iAdvize tag script.                     |
 | allow-same-origin | Allows the iAdvize tag to access the host cookies and storages |
 | allow-popups      | Allows the iAdvize tag to open links sent by the agent         |
 | allow-forms       | Allows the iAdvize tag to submit the visitor email if needed   |
+
+And the following allow parameters:
+| allow param       | description                                                    |
+|-------------------|----------------------------------------------------------------|
+| camera            | Allows the boxed tag to ask the camera permission (for video calls) |
+| microphone        | Allows the boxed tag to ask the microphone permission (for video calls) |
+| autoplay          | Allows the boxed tag to launch the video stream automatically  |
 
 ## Add the host script on your site's main page
 
