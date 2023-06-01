@@ -22,7 +22,7 @@ Ex :
 <!DOCTYPE html>
 <html>
   <body>
-   <script src="https://static.iadvize.com/boxed-tag/1.4.2/index.js" integrity="sha512-NS7M2FyNHaefJ42ilas6W+t/qJleeGTWIyhM2pj2Pn+t7PgWRH/HarBqV8HT+RFDi6JVS1ReAeF2Afz5dwpBjQ==" crossorigin="anonymous"></script>
+   <script src="https://static.iadvize.com/boxed-tag/1.4.4/index.js" integrity="sha512-NS7M2FyNHaefJ42ilas6W+t/qJleeGTWIyhM2pj2Pn+t7PgWRH/HarBqV8HT+RFDi6JVS1ReAeF2Afz5dwpBjQ==" crossorigin="anonymous"></script>
     <script>
       window.iAdvizeBoxedTag.initIAdvizeIframe(<your-sid>, "halc");
     </script>
@@ -48,13 +48,14 @@ style.innerHTML = `
     width: 100vw;
     height: 100vh;
     pointer-events: none;
+    z-index: 2147483647;
   }
 `;
 document.body.append(style);
 
 const boxedTagScript = document.createElement("script");
 boxedTagScript.src =
-  "https://static.iadvize.com/boxed-tag/1.4.2/index.js";
+  "https://static.iadvize.com/boxed-tag/1.4.4/index.js";
 boxedTagScript.integrity =
 "sha512-NS7M2FyNHaefJ42ilas6W+t/qJleeGTWIyhM2pj2Pn+t7PgWRH/HarBqV8HT+RFDi6JVS1ReAeF2Afz5dwpBjQ==";
 boxedTagScript.crossOrigin = "anonymous";
