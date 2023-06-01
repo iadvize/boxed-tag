@@ -1,6 +1,6 @@
 {
   "name": "@iadvize-oss/boxed-tag",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "type": "module",
   "description": "Boxed iAdvize tag",
   "main": "dist/index.js",
