@@ -12,11 +12,12 @@ This is the simplest way too add the iAdvize Boxed Tag to a website with the def
 
 Serve a HTML file. We will use the name `iadvize-boxed-iframe.html`, but any name can be chosen.
 This file needs to be served on the same top domain as the page it will be included in.
+The file should be served by a sub-domain dedicated to iAdvize.
 Replace `<your-sid>` with your own sid.
 
-Ex : 
+Ex :
 - Web page : https://hostpage.brand-domain.com
-- Iframe : https://static.brand-domain.com/iadvize-boxed-iframe.html
+- Iframe : https://chat.brand-domain.com/iadvize-boxed-iframe.html
 
 ```html
 <!DOCTYPE html>
@@ -24,7 +25,12 @@ Ex :
   <body>
    <script src="https://static.iadvize.com/boxed-tag/1.4.4/index.js" integrity="sha512-NS7M2FyNHaefJ42ilas6W+t/qJleeGTWIyhM2pj2Pn+t7PgWRH/HarBqV8HT+RFDi6JVS1ReAeF2Afz5dwpBjQ==" crossorigin="anonymous"></script>
     <script>
-      window.iAdvizeBoxedTag.initIAdvizeIframe(<your-sid>, "halc");
+      window.iAdvizeInterface = window.iAdvizeInterface || [];
+      window.iAdvizeInterface.config = {
+        sid: <your-sid>,
+        allowedCookieDomains: ['chat.brand-domain.com']
+      };
+      window.iAdvizeBoxedTag.initIAdvizeIframe("halc");
     </script>
   </body>
 </html>
@@ -32,11 +38,11 @@ Ex :
 
 ## 2 - Add the following script
 
-Add the following script (in your frontend code, or in your tag manager), replacing `https://static.brand-domain.com/iadvize-boxed-iframe.html` with the actual URL of the iframe : 
+Add the following script (in your frontend code, or in your tag manager), replacing `https://chat.brand-domain.com/iadvize-boxed-iframe.html` with the actual URL of the iframe :
 
 ```javascript
 // Change this URL with the actual URL of the iframe
-const iAdvizeIframeUrl = "https://static.brand-domain.com/iadvize-boxed-iframe.html";
+const iAdvizeIframeUrl = "https://chat.brand-domain.com/iadvize-boxed-iframe.html";
 
 const style = document.createElement("style");
 style.innerHTML = `
@@ -75,7 +81,7 @@ document.body.append(boxedTagScript);
 ```
 
 # Advanced installation
-This is a more advanced installation, allowing : 
+This is a more advanced installation, allowing :
 - a custom configuration,
 - the use of WebSDK methods (see https://developers.iadvize.com/documentation/javascript-web-sdk#javascript-web-sdk).
 
@@ -89,15 +95,19 @@ npm install @iadvize-oss/boxed-tag
 
 Create a js file that will import the iframe script.
 Then call `initIAdvizeIframe` to listen the host messages.
-The `initIAdvizeIframe` comes with 2 arguments :
+The `initIAdvizeIframe` comes with 1 argument :
 
-- `sid` : your iAdvize sid.
 - `iAdvizePlatform` : the iadvize platform (default: ha).
 
 ```js
 import { initIAdvizeIframe } from '@iadvize-oss/boxed-tag';
 
-initIAdvizeIframe(<sid>, <iAdvizePlatform>);
+window.iAdvizeInterface = window.iAdvizeInterface || [];
+window.iAdvizeInterface.config = {
+  sid: <sid>,
+};
+
+initIAdvizeIframe(<iAdvizePlatform>);
 ```
 
 ## Add a boxed iframe
@@ -153,11 +163,11 @@ Then, the target of the postMessage calls can listen to the events using `window
 
 ## Call iAdvize WebSDK methods from host
 
-WebSDK methods cannot be called from the host context because the iAdvize tag is isolated in the iframe : we need to communicate to the iframe what we want to call.  
+WebSDK methods cannot be called from the host context because the iAdvize tag is isolated in the iframe : we need to communicate to the iframe what we want to call.
 
-After having called `initIAdvizeHost`, a `iAdvizeBoxedInterface` object is available in the host window context.  
+After having called `initIAdvizeHost`, a `iAdvizeBoxedInterface` object is available in the host window context.
 This object sends the `method` name and `args` to the iframe, that will call the webSDK.
-The `activate`, `get` and `on` methods can return a value to the host :  
+The `activate`, `get` and `on` methods can return a value to the host :
 to retrieve it, add a `window.addEventListener("message")` and check the `e.data.method` property to recognize the method called.
 
 ### Navigate
@@ -172,7 +182,7 @@ window.iAdvizeBoxedInterface.push({
 ### Activate
 The host can listen to the result of the `activate` call.
 
-For an anonymous authentication: 
+For an anonymous authentication:
 
 ```js
 // WebSDK activate anonymous
@@ -191,14 +201,14 @@ window.addEventListener('message', ({ data: { method, activation } }) => {
 });
 ```
 
-For a secured authentication, the JWE token should be generated on the host side and sent to the iframe : 
+For a secured authentication, the JWE token should be generated on the host side and sent to the iframe :
  - the host should listen a `get-activate-auth-token` message initiated by the iframe.
  - the backend api then gets the JWE token,
  - the token is then sent to the iframe inside a `set-activate-auth-token` message.
 
 The `get-activate-auth-token` listener allows the iframe to ask for a token refresh if needed.
 
-Example of secured authentication implementation: 
+Example of secured authentication implementation:
 ```js
 // WebSDK activate secured auth
 const getJweToken = Promise.resolve('myJWEToken');// your backend logic to generate a JWE

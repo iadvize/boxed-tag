@@ -43,6 +43,19 @@ type iAdvizeInterfaceParametersOn = {
   args: Array<string>;
 } & iAdvizeInterfaceParameters;
 
+type IAdvizeInterface = {
+  config?: Record<string, unknown>;
+  push: (callback: (iAdvize: IAdvizeGlobal) => void) => void;
+} & Array<(iAdvize: IAdvizeGlobal) => void>;
+
+type ExtendedWindow = Window & {
+  iAdvizeInterface: IAdvizeInterface;
+  host?: {
+    width: number;
+    height: number;
+  };
+};
+
 const isInternal = (
   data: iAdvizeInterfaceParameters,
 ): data is iAdvizeInterfaceParametersInternals => data.command === 'internals';
@@ -60,7 +73,7 @@ const isOnOff = (
 ): data is iAdvizeInterfaceParametersOn =>
   data.method === 'on' || data.method === 'off';
 
-export function getActivateAuthToken(context: Window): Promise<string> {
+export function getActivateAuthToken(context: ExtendedWindow): Promise<string> {
   context.parent.postMessage(
     { command: 'internals', method: 'get-activate-auth-token' },
     '*',
@@ -81,14 +94,13 @@ export function getActivateAuthToken(context: Window): Promise<string> {
 }
 
 export function initIAdvizeIframe(
-  websiteId: number,
   platform = 'ha',
-  context = window,
+  context = window as unknown as ExtendedWindow,
 ) {
   // iAdvize configuration
   context.iAdvizeInterface = context.iAdvizeInterface || [];
   context.iAdvizeInterface.config = {
-    sid: websiteId,
+    ...context.iAdvizeInterface.config,
     mode: 'sandboxed',
   };
 

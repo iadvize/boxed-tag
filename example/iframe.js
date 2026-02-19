@@ -1,5 +1,9 @@
 import { initIAdvizeIframe } from '@iadvize-oss/boxed-tag';
 
-const sid = 1;
+window.iAdvizeInterface = window.iAdvizeInterface || [];
+window.iAdvizeInterface.config = {
+  sid: 1,
+};
+
 const iAdvizePlatform = 'iAdvizePlatform';
-initIAdvizeIframe(sid, iAdvizePlatform);
+initIAdvizeIframe(iAdvizePlatform);

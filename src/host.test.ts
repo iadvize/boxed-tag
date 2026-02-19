@@ -14,8 +14,12 @@ describe('host', () => {
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe('lc', win);
 
       setTimeout(() => {
         iframe?.contentWindow?.iAdvizeInterface.forEach((fn) => {
@@ -118,8 +122,12 @@ describe('host', () => {
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe('lc', win);
     });
     document.body.appendChild(iframe);
 
@@ -142,8 +150,12 @@ describe('host', () => {
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe('lc', win);
     });
     document.body.appendChild(iframe);
 
@@ -170,8 +182,12 @@ describe('host', () => {
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe('lc', win);
     });
     document.body.appendChild(iframe);
 
@@ -198,8 +214,12 @@ describe('host', () => {
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe('lc', win);
     });
     document.body.appendChild(iframe);
 
