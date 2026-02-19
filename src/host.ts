@@ -46,7 +46,7 @@ export function resizeIFrame(
   }
 }
 
-export function initIAdvizeHost(sandboxId: string): void {
+export function initIAdvizeHost(sandboxId: string, targetOrigin = '*'): void {
   const iAdvizeSandbox = document.getElementById(
     sandboxId,
   ) as HTMLIFrameElement;
@@ -65,7 +65,7 @@ export function initIAdvizeHost(sandboxId: string): void {
         hostWidth: window.innerWidth,
         hostHeight: window.innerHeight,
       },
-      '*',
+      targetOrigin,
     );
   }
 
@@ -80,7 +80,7 @@ export function initIAdvizeHost(sandboxId: string): void {
             method,
             args,
           },
-          '*',
+          targetOrigin,
         );
         return hostWindow.iAdvizeBoxedInterface.length;
       },
@@ -94,7 +94,10 @@ export function initIAdvizeHost(sandboxId: string): void {
 
   window.addEventListener('resize', forwardWindowDimensions);
   window.addEventListener('message', (e) => {
-    if (e.source !== iAdvizeSandbox.contentWindow) {
+    if (
+      e.source !== iAdvizeSandbox.contentWindow ||
+      (targetOrigin !== '*' && e.origin !== targetOrigin)
+    ) {
       return;
     }
     resizeIFrame(iAdvizeSandbox, e.data);
