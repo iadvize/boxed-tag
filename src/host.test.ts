@@ -1,8 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { initIAdvizeHost, resizeIFrame } from './host';
 import { initIAdvizeIframe } from './iframe';
 
 describe('host', () => {
-  afterEach(() => document.querySelector('iframe')?.remove());
+  beforeEach(() => {
+    (window as any).iAdvizeBoxedInterface = [];
+  });
+  afterEach(() => {
+    document.querySelector('iframe')?.remove();
+  });
   it('should call web SDK methods', (done) => {
     const navigateMock = jest.fn();
     const getMock = jest.fn();
@@ -14,8 +20,12 @@ describe('host', () => {
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe(1, 'lc', win, '*');
 
       setTimeout(() => {
         iframe?.contentWindow?.iAdvizeInterface.forEach((fn) => {
@@ -33,7 +43,7 @@ describe('host', () => {
     document.body.appendChild(iframe);
 
     // Init host
-    initIAdvizeHost('myIframeId');
+    initIAdvizeHost('myIframeId', '*');
 
     // Web SDK on
     window.iAdvizeBoxedInterface.push({
@@ -94,12 +104,15 @@ describe('host', () => {
           expect(setMock).toHaveBeenCalledWith('visitor:cookiesConsent', true);
         }
         if (method === 'get-activate-auth-token') {
-          window.iAdvizeBoxedInterface.push({
+          (window as any).iAdvizeBoxedInterface.push({
             method: 'set-activate-auth-token',
             args: `myToken`,
           });
         }
-        if (method === 'activate') {
+        if (
+          method === 'activate' &&
+          activation?.authenticationOption?.type === 'SECURED_AUTHENTICATION'
+        ) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(activation).toEqual({
             authenticationOption: {
@@ -118,13 +131,17 @@ describe('host', () => {
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe(1, 'lc', win, '*');
     });
     document.body.appendChild(iframe);
 
     // Init host
-    initIAdvizeHost('myIframeId');
+    initIAdvizeHost('myIframeId', '*');
 
     window.innerWidth = 400;
     window.innerHeight = 600;
@@ -136,19 +153,23 @@ describe('host', () => {
       done();
     }, 1000);
   });
-  it('should resize iframe: right positioning', () => {
+  it('should resize iframe: right positioning', (done) => {
     const iframe = document.createElement('iframe');
 
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe(1, 'lc', win, '*');
     });
     document.body.appendChild(iframe);
 
     // Init host
-    initIAdvizeHost('myIframeId');
+    initIAdvizeHost('myIframeId', '*');
 
     resizeIFrame(iframe, {
       width: 400,
@@ -162,21 +183,26 @@ describe('host', () => {
       expect(iframe.style.width).toEqual('400px');
       expect(iframe.style.right).toEqual('0px');
       expect(iframe.style.bottom).toEqual('0px');
+      done();
     });
   });
-  it('should resize iframe: left positioning', () => {
+  it('should resize iframe: left positioning', (done) => {
     const iframe = document.createElement('iframe');
 
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe(1, 'lc', win, '*');
     });
     document.body.appendChild(iframe);
 
     // Init host
-    initIAdvizeHost('myIframeId');
+    initIAdvizeHost('myIframeId', '*');
 
     resizeIFrame(iframe, {
       width: 400,
@@ -190,21 +216,26 @@ describe('host', () => {
       expect(iframe.style.width).toEqual('400px');
       expect(iframe.style.left).toEqual('0px');
       expect(iframe.style.bottom).toEqual('0px');
+      done();
     });
   });
-  it('should reset iframe size on chatbox resize', () => {
+  it('should reset iframe size on chatbox resize', (done) => {
     const iframe = document.createElement('iframe');
 
     // Init iframe
     iframe.setAttribute('id', 'myIframeId');
     iframe.addEventListener('load', () => {
-      // @ts-expect-error : window
-      initIAdvizeIframe(1, 'lc', iframe.contentWindow);
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      win.iAdvizeInterface.config = {
+        sid: 1,
+      };
+      initIAdvizeIframe(1, 'lc', win, '*');
     });
     document.body.appendChild(iframe);
 
     // Init host
-    initIAdvizeHost('myIframeId');
+    initIAdvizeHost('myIframeId', '*');
 
     resizeIFrame(iframe, { width: 0, height: 0, right: 0, bottom: 0 });
 
@@ -212,6 +243,118 @@ describe('host', () => {
       expect(iframe.style.pointerEvents).toEqual('none');
       expect(iframe.style.width).toEqual('100vw');
       expect(iframe.style.height).toEqual('100vh');
+      done();
     });
+  });
+  it('should handle logout command', (done) => {
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('id', 'logoutIframe');
+    const logoutMock = jest.fn().mockResolvedValue('logout success');
+
+    const onMessage = () => {
+      expect(logoutMock).toHaveBeenCalledWith();
+      window.removeEventListener('message', onMessage);
+      done();
+    };
+    window.addEventListener('message', onMessage);
+
+    iframe.addEventListener('load', () => {
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      initIAdvizeIframe(1, 'lc', win, '*');
+      setTimeout(() => {
+        win.iAdvizeInterface.forEach((fn: any) =>
+          fn({ logout: logoutMock, on: jest.fn() }),
+        );
+      }, 200);
+    });
+    document.body.appendChild(iframe);
+    initIAdvizeHost('logoutIframe', '*');
+
+    window.iAdvizeBoxedInterface.push({ method: 'logout', args: [] });
+  });
+  it('should handle anonymous activation', (done) => {
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('id', 'anonymousIframe');
+    const activateMock = jest.fn().mockImplementation((cb) => cb());
+
+    const onMessage = (e: MessageEvent) => {
+      expect(e.data.method).toBe('activate');
+      expect(e.data.activation.authenticationOption.type).toBe(
+        'ANONYMOUS_AUTHENTICATION',
+      );
+      window.removeEventListener('message', onMessage);
+      done();
+    };
+    window.addEventListener('message', onMessage);
+
+    iframe.addEventListener('load', () => {
+      const win = iframe.contentWindow as any;
+      win.iAdvizeInterface = [];
+      initIAdvizeIframe(1, 'lc', win, '*');
+      setTimeout(() => {
+        win.iAdvizeInterface.forEach((fn: any) =>
+          fn({ activate: activateMock, on: jest.fn() }),
+        );
+      }, 200);
+    });
+    document.body.appendChild(iframe);
+    initIAdvizeHost('anonymousIframe', '*');
+
+    window.iAdvizeBoxedInterface.push({
+      method: 'activate',
+      args: { authenticationOption: { type: 'ANONYMOUS_AUTHENTICATION' } },
+    });
+  });
+  it('should ignore host messages from incorrect origin', (done) => {
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('id', 'originHostIframe');
+
+    document.body.appendChild(iframe);
+    initIAdvizeHost('originHostIframe', 'https://correct-origin.com');
+
+    // We check if the iframe styles changed instead of mocking.
+    iframe.style.width = '10px';
+
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        origin: 'https://wrong-origin.com',
+        data: { width: 100, height: 100 },
+        source: iframe.contentWindow,
+      }),
+    );
+
+    setTimeout(() => {
+      expect(iframe.style.width).toBe('10px');
+      done();
+    }, 100);
+  });
+  it('should ignore iframe messages from incorrect origin', (done) => {
+    const win = {
+      addEventListener: jest.fn(),
+      parent: { postMessage: jest.fn() },
+      iAdvizeInterface: [],
+      document: {
+        createElement: () => ({ src: '' }),
+        body: { appendChild: jest.fn() },
+      },
+    } as any;
+
+    initIAdvizeIframe(1, 'lc', win, 'https://correct-origin.com');
+
+    const messageHandler = win.addEventListener.mock.calls.find(
+      (call: any) => call[0] === 'message',
+    )[1];
+
+    messageHandler({
+      origin: 'https://wrong-origin.com',
+      data: { command: 'internals', method: 'logout' },
+    });
+
+    setTimeout(() => {
+      // initIAdvizeIframe pushes 1 callback for app:boundariesChange
+      expect(win.iAdvizeInterface).toHaveLength(1);
+      done();
+    }, 100);
   });
 });

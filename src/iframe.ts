@@ -43,6 +43,19 @@ type iAdvizeInterfaceParametersOn = {
   args: Array<string>;
 } & iAdvizeInterfaceParameters;
 
+type IAdvizeInterface = {
+  config?: Record<string, unknown>;
+  push: (callback: (iAdvize: IAdvizeGlobal) => void) => void;
+} & Array<(iAdvize: IAdvizeGlobal) => void>;
+
+type ExtendedWindow = Window & {
+  iAdvizeInterface: IAdvizeInterface;
+  host?: {
+    width: number;
+    height: number;
+  };
+};
+
 const isInternal = (
   data: iAdvizeInterfaceParameters,
 ): data is iAdvizeInterfaceParametersInternals => data.command === 'internals';
@@ -60,17 +73,23 @@ const isOnOff = (
 ): data is iAdvizeInterfaceParametersOn =>
   data.method === 'on' || data.method === 'off';
 
-export function getActivateAuthToken(context: Window): Promise<string> {
+export function getActivateAuthToken(
+  context: ExtendedWindow,
+  targetOrigin = '*',
+): Promise<string> {
   context.parent.postMessage(
     { command: 'internals', method: 'get-activate-auth-token' },
-    '*',
+    targetOrigin,
   );
 
   return new Promise((resolve) => {
     // Listen once set-activate-auth-token from host. The listener is then removed.
     context.addEventListener(
       'message',
-      ({ data: { method, args: token } }) => {
+      ({ origin, data: { method, args: token } }) => {
+        if (targetOrigin !== '*' && origin !== targetOrigin) {
+          return;
+        }
         if (method === 'set-activate-auth-token') {
           resolve(token);
         }
@@ -83,18 +102,29 @@ export function getActivateAuthToken(context: Window): Promise<string> {
 export function initIAdvizeIframe(
   websiteId: number,
   platform = 'ha',
-  context = window,
+  context = window as unknown as ExtendedWindow,
+  targetOrigin = '*',
 ) {
   // iAdvize configuration
   context.iAdvizeInterface = context.iAdvizeInterface || [];
   context.iAdvizeInterface.config = {
+    ...context.iAdvizeInterface.config,
     sid: websiteId,
     mode: 'sandboxed',
   };
 
   context.addEventListener(
     'message',
-    ({ data }: { data: iAdvizeInterfaceParameters }) => {
+    ({
+      origin,
+      data,
+    }: {
+      origin: string;
+      data: iAdvizeInterfaceParameters;
+    }) => {
+      if (targetOrigin !== '*' && origin !== targetOrigin) {
+        return;
+      }
       // Internal methods forwarding
       if (isActivate(data)) {
         const {
@@ -108,7 +138,7 @@ export function initIAdvizeIframe(
           const activation = await iAdvize.activate(async () => {
             const token =
               type === 'SECURED_AUTHENTICATION'
-                ? await getActivateAuthToken(context)
+                ? await getActivateAuthToken(context, targetOrigin)
                 : null;
             return {
               authenticationOption: {
@@ -117,19 +147,25 @@ export function initIAdvizeIframe(
               },
             };
           });
-          context.parent.postMessage({ command, method, activation }, '*');
+          context.parent.postMessage(
+            { command, method, activation },
+            targetOrigin,
+          );
         });
       } else if (isLogout(data)) {
         const { command, method } = data;
         context.iAdvizeInterface.push(async (iAdvize: IAdvizeGlobal) => {
           const logout = await iAdvize.logout();
-          context.parent.postMessage({ command, method, logout }, '*');
+          context.parent.postMessage({ command, method, logout }, targetOrigin);
         });
       } else if (isOnOff(data)) {
         const { command, method, args } = data;
         context.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) =>
           iAdvize[method](...args, (value: unknown) =>
-            context.parent.postMessage({ command, method, args, value }, '*'),
+            context.parent.postMessage(
+              { command, method, args, value },
+              targetOrigin,
+            ),
           ),
         );
       } else if (isInternal(data)) {
@@ -137,7 +173,10 @@ export function initIAdvizeIframe(
 
         context.iAdvizeInterface.push((iAdvize: IAdvizeGlobal) => {
           const value = iAdvize[method](...args);
-          context.parent.postMessage({ command, method, args, value }, '*');
+          context.parent.postMessage(
+            { command, method, args, value },
+            targetOrigin,
+          );
         });
       }
 
@@ -155,7 +194,7 @@ export function initIAdvizeIframe(
   context.iAdvizeInterface.push(function (iAdvize: IAdvizeGlobal) {
     // Chatbox sizing
     iAdvize.on('app:boundariesChange', (boundaries: unknown) => {
-      context.parent.postMessage(boundaries, '*');
+      context.parent.postMessage(boundaries, targetOrigin);
     });
   });
 

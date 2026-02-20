@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Add a `z-index` to the suggested "simple" installation
 
+## [Unreleased]
+
+### Changed
+
+- **Changed:** `initIAdvizeHost(sandboxId)` `targetOrigin` argument is now optional (defaults to `*`).
+- **Changed:** `initIAdvizeIframe` now accepts a 4th optional argument `targetOrigin` (defaults to `*`) for enhanced security. The signature remains backward compatible: `initIAdvizeIframe(websiteId, platform, context, targetOrigin)`.
+- **Changed:** `getActivateAuthToken` now accepts an optional `targetOrigin` argument (defaults to `*`).
+- All `postMessage` calls now use the specific `targetOrigin` (or `*` if not provided) for enhanced security.
+
+### Security
+
+- Enforced strict origin checks on all incoming and outgoing messages to prevent Cross-Site Scripting (XSS) and data leakage.
+
+### Fixed
+
+-   Fixed potential data leakage of JWE tokens by ensuring they are only sent to the trusted iframe origin.
+
 ## [1.4.3]
 
 ### Fixed
