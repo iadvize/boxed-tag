@@ -41,8 +41,7 @@ defaults: &defaults
 executors:
   nodejs:
     docker:
-      - image: iadvize/builder-front:16
-        <<: *iadvize-docker-credentials
+      - image: cimg/node:16.20
     working_directory: ~/node/boxed-tag
     environment:
       NODE_OPTIONS: --max_old_space_size=2048
@@ -95,9 +94,26 @@ jobs:
     <<: *defaults
     machine:
       image: ubuntu-2004:202201-02
+    parameters:
+      target_env:
+        description: "Environment whose static files bucket to publish to"
+        type: enum
+        enum: ["dev", "prod"]
     steps:
       - *restore-workspace
-      - run: .circleci/uploadS3.sh
+      - run:
+          name: "Publish the web bundle to S3 (<< parameters.target_env >>)"
+          environment:
+            TARGET_ENV: << parameters.target_env >>
+          command: |
+            if [ "$TARGET_ENV" = "prod" ]; then
+              export AWS_ACCESS_KEY_ID=$PROD_STATIC_FILES_AWS_ACCESS_KEY_ID
+              export AWS_SECRET_ACCESS_KEY=$PROD_STATIC_FILES_AWS_SECRET_ACCESS_KEY
+            else
+              export AWS_ACCESS_KEY_ID=$DEV_STATIC_FILES_AWS_ACCESS_KEY_ID
+              export AWS_SECRET_ACCESS_KEY=$DEV_STATIC_FILES_AWS_SECRET_ACCESS_KEY
+            fi
+            .circleci/uploadS3.sh
 
 workflows:
   version: 2
@@ -128,6 +144,15 @@ workflows:
             - install
           filters:
             <<: *filters-all-branches
+
+      - upload-s3:
+          name: upload-s3-dev
+          target_env: dev
+          context: org-global
+          requires:
+            - build
+          filters:
+            <<: *filters-all-branches
   upload:
     jobs:
       - install:
@@ -143,6 +168,8 @@ workflows:
             <<: *filters-only-tag
 
       - upload-s3:
+          name: upload-s3-prod
+          target_env: prod
           context: org-global
           requires:
             - build
