@@ -1,5 +1,9 @@
 version: 2.1
 
+orbs:
+  ci-cd: iadvize/ci-cd@volatile
+  aws-cli: circleci/aws-cli@5.1.0
+
 references:
   iadvize-docker-credentials: &iadvize-docker-credentials
     auth:
@@ -41,8 +45,7 @@ defaults: &defaults
 executors:
   nodejs:
     docker:
-      - image: iadvize/builder-front:16
-        <<: *iadvize-docker-credentials
+      - image: cimg/node:16.20
     working_directory: ~/node/boxed-tag
     environment:
       NODE_OPTIONS: --max_old_space_size=2048
@@ -93,11 +96,34 @@ jobs:
 
   upload-s3:
     <<: *defaults
-    machine:
-      image: ubuntu-2004:202201-02
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    parameters:
+      target_env:
+        description: "Environment whose static files bucket to publish to"
+        type: enum
+        enum: ["dev", "prod"]
+      aws_access_key_id:
+        type: env_var_name
+      aws_secret_access_key:
+        type: env_var_name
     steps:
       - *restore-workspace
-      - run: .circleci/uploadS3.sh
+      - run:
+          name: "Read the version from package.json"
+          command: |
+            VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | awk '{$1=$1};1')
+            echo "export VERSION=$VERSION" >> "$BASH_ENV"
+      - aws-cli/setup:
+          aws_access_key_id: << parameters.aws_access_key_id >>
+          aws_secret_access_key: << parameters.aws_secret_access_key >>
+          region: eu-central-1
+      - ci-cd/s3_sync:
+          app_path: boxed-tag
+          local_from: web
+          remote_to: $VERSION
+          target_env: << parameters.target_env >>
 
 workflows:
   version: 2
@@ -128,6 +154,17 @@ workflows:
             - install
           filters:
             <<: *filters-all-branches
+
+      - upload-s3:
+          name: upload-s3-dev
+          target_env: dev
+          aws_access_key_id: DEV_STATIC_FILES_AWS_ACCESS_KEY_ID
+          aws_secret_access_key: DEV_STATIC_FILES_AWS_SECRET_ACCESS_KEY
+          context: org-global
+          requires:
+            - build
+          filters:
+            <<: *filters-all-branches
   upload:
     jobs:
       - install:
@@ -143,6 +180,10 @@ workflows:
             <<: *filters-only-tag
 
       - upload-s3:
+          name: upload-s3-prod
+          target_env: prod
+          aws_access_key_id: PROD_STATIC_FILES_AWS_ACCESS_KEY_ID
+          aws_secret_access_key: PROD_STATIC_FILES_AWS_SECRET_ACCESS_KEY
           context: org-global
           requires:
             - build

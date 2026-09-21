@@ -1,9 +1,22 @@
+![boxed-tag](http://outillage-informatique.iadvize.net/version-badge-api/property/badge/boxed-tag/owner.svg?token=Z8Nu7mf8EXcJGgpTRHcG3z7aktpJTt)
 # Boxed tag
 
 The “iAdvize Boxed Tag” is a way to include the iAdvize Tag in the most secure way, without it having access to the client’s website.
 
 With this solution, the iAdvize tag can be loaded in an isolated box (a sandboxed iframe).
 This way, the main page context cannot be accessed by the iAdvize tag: the main page only sends controlled, relevant data to the boxed tag.
+
+## Where the built bundle is served from
+
+`npm run build` produces three outputs; the `web/` one (an IIFE bundle exposing
+`iAdvizeBoxedTag`) is published to `idz-${env}-main-front-static-files` under
+`boxed-tag/${version}/`, and served straight through CloudFront.
+
+The public URL is unchanged: `https://static.iadvize.com/boxed-tag/<version>/index.js`.
+Only the origin moved — requests used to be proxied through Traefik and the
+`templates` Caddy server before reaching S3.
+
+A branch publishes to the dev bucket; a tag publishes to production.
 
 # Simple installation
 This is the simplest way too add the iAdvize Boxed Tag to a website with the default configuration.
@@ -22,7 +35,7 @@ Ex :
 <!DOCTYPE html>
 <html>
   <body>
-   <script src="https://static.iadvize.com/boxed-tag/1.4.4/index.js" integrity="sha512-NS7M2FyNHaefJ42ilas6W+t/qJleeGTWIyhM2pj2Pn+t7PgWRH/HarBqV8HT+RFDi6JVS1ReAeF2Afz5dwpBjQ==" crossorigin="anonymous"></script>
+   <script src="https://static.iadvize.com/boxed-tag/1.4.5/index.js" integrity="sha512-NS7M2FyNHaefJ42ilas6W+t/qJleeGTWIyhM2pj2Pn+t7PgWRH/HarBqV8HT+RFDi6JVS1ReAeF2Afz5dwpBjQ==" crossorigin="anonymous"></script>
     <script>
       window.iAdvizeBoxedTag.initIAdvizeIframe(<your-sid>, "halc");
     </script>
@@ -55,7 +68,7 @@ document.body.append(style);
 
 const boxedTagScript = document.createElement("script");
 boxedTagScript.src =
-  "https://static.iadvize.com/boxed-tag/1.4.4/index.js";
+  "https://static.iadvize.com/boxed-tag/1.4.5/index.js";
 boxedTagScript.integrity =
 "sha512-NS7M2FyNHaefJ42ilas6W+t/qJleeGTWIyhM2pj2Pn+t7PgWRH/HarBqV8HT+RFDi6JVS1ReAeF2Afz5dwpBjQ==";
 boxedTagScript.crossOrigin = "anonymous";
