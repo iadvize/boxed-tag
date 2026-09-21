@@ -5,12 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Changed
-
--   The web bundle is now published to the static files bucket and served
-    directly by CloudFront, instead of being proxied through the `templates`
-    server. The public URL is unchanged, so nothing to do on your side.
-
 ### Fixed
 
 Add a `z-index` to the suggested "simple" installation
