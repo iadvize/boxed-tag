@@ -23,6 +23,7 @@ jobs:
       with:
         ref: master
         token: ${{ secrets.TOKEN_REPO_WRITE }}
+        persist-credentials: true
 
     - name: Git config
       run: |
