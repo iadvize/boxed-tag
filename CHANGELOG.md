@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Security
+
+-   GitHub Actions workflows no longer persist git credentials on checkout
+    unless they push (`persist-credentials` set explicitly). No change to the
+    published package.
+
 ### Changed
 
 -   The web bundle is now published to the static files bucket and served
